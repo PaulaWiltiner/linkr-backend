@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { getSession } from "../repositories/authRepository.js";
 dotenv.config();
 
-export async function authenticateToken(req, res, next) {
+export default async function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
