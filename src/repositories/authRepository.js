@@ -31,7 +31,7 @@ export async function getSessionUserId(userId) {
 export async function createSession(token, userId) {
   return connection.query(
     `
-     INSERT INTO sessions (token, "userId") VALUES ($1, $2)`,
+     INSERT INTO sessions (token, "userId") VALUES ($1, $2);`,
     [token, userId]
   );
 }
@@ -39,7 +39,7 @@ export async function createSession(token, userId) {
 export async function deleteSession(token) {
   return connection.query(
     `
-     DELETE FROM sessions WHERE token=$1`,
+     DELETE FROM sessions WHERE token=$1;`,
     [token]
   );
 }
