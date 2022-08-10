@@ -22,14 +22,14 @@ export async function createPost(req, res) {
       for (let i = 0; i < userHashtags.length; i++) {
         for (let j = 0; j < arrHashtags.length; j++) {
           if (arrHashtags[i] === userHashtags[j]) {
-            arr.push(arrHashtags[i]);
+            if (!arr.find((hashtag) => hashtag === arrHashtags[i])) {
+              arr.push(arrHashtags[i]);
+            }
           }
         }
       }
       return arr;
     }
-
-    console.log(selectRepeatedHashtags());
 
     // hashtags.map(hashtag => {
     //     await connection.query(`INSERT INTO trending (hashtag) VALUES ($1)`, [hashtag])
