@@ -9,5 +9,6 @@ export async function validateCreatePost(req, res, next) {
 
     return res.status(422).send(errorsMessageArray);
   }
+
   next();
 }
