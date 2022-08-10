@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { getSession } from "../repositories/authRepository";
 dotenv.config();
 
 export async function authenticateToken(req, res, next) {
@@ -11,8 +12,15 @@ export async function authenticateToken(req, res, next) {
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
     console.log(user);
     if (err) return res.sendStatus(401);
-
     req.email = user;
-    next();
   });
+
+  const session = await getSession();
+  if (!session) {
+    return res.sendStatus(401);
+  }
+  
+  res.locals.session = session;
+  
+  next();
 }
