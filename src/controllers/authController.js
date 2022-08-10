@@ -14,13 +14,10 @@ export async function login(req, res) {
   if (!user) {
     return res.sendStatus(401);
   }
-  if (
-    bcrypt.compareSync(password, user.password) &&
-    !getSessionUserId(user.id)
-  ) {
+  const session = await getSessionUserId(user.id);
+  if (bcrypt.compareSync(password, user.password) && !session) {
     const token = uuid();
     await createSession(token, user.id);
-    console.log(user);
     return res
       .send({
         username: user.username,
