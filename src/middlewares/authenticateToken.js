@@ -4,8 +4,8 @@ import { getSession } from "../repositories/authRepository.js";
 dotenv.config();
 
 export default async function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const { authorization } = req.headers;
+  const token = authorization?.split(" ")[1];
 
   if (token == null) {
     console.log(token, "token");
