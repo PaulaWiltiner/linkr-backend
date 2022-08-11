@@ -40,8 +40,7 @@ export async function login(req, res) {
   if (!user) {
     return res.sendStatus(401);
   }
-  const session = await getSessionUserId(user.id);
-  if (bcrypt.compareSync(password, user.password) && !session) {
+  if (bcrypt.compareSync(password, user.password)) {
     const token = jwt.sign({ email: users.email }, process.env.ACCESS_TOKEN);
     await createSession(token, user.id);
     return res
