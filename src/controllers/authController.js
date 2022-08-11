@@ -54,7 +54,7 @@ export async function login(req, res) {
 export async function logout(req, res) {
   try {
     const { session } = res.locals;
-    await deleteSession(session.userId);
+    await deleteSession(session.token);
     return res.sendStatus(200);
   } catch (err) {
     res.sendStatus(401);
