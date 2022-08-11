@@ -14,7 +14,7 @@ export default async function authenticateToken(req, res, next) {
     req.email = user;
   });
 
-  const session = await getSession();
+  const session = await getSession(token);
   if (!session) {
     return res.sendStatus(401);
   }
