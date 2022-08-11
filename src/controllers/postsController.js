@@ -1,4 +1,5 @@
 import { connection } from "../dbStrategy/postgres.js";
+import { getPosts } from "../repositories/postsRepository.js";
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -70,6 +71,16 @@ export async function createPost(req, res) {
     );
 
     return res.sendStatus(201);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function pullPosts(req, res) {
+  try {
+    const postList = await getPosts();
+    return res.send(postList).status(200);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
