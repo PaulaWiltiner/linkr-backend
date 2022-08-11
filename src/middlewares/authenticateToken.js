@@ -8,13 +8,13 @@ export default async function authenticateToken(req, res, next) {
   const token = authHeader && authHeader.split(" ")[1];
 
   if (token == null) {
-    console.log(token);
+    console.log(token, "token");
     return res.sendStatus(401);
   }
 
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
     if (err) {
-      console.log(err);
+      console.log(err, "error");
       return res.sendStatus(401);
     }
     req.email = user;
@@ -22,7 +22,7 @@ export default async function authenticateToken(req, res, next) {
 
   const session = await getSession(token);
   if (!session) {
-    console.log(session);
+    console.log(session, "session");
     return res.sendStatus(401);
   }
 
