@@ -20,7 +20,7 @@ export default async function signUp(req, res) {
   );
 
   if (isEmail.length > 0) {
-    res.sendStatus(409);
+    res.status(409).send("email is already being used");
     return;
   }
   const hashPassword = bcrypt.hashSync(password, 10);
