@@ -11,7 +11,8 @@ export default async function authenticateToken(req, res, next) {
 
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
     if (err) return res.sendStatus(401);
-    req.email = user;
+
+    req.email = user.email;
   });
 
   const session = await getSession(token);
