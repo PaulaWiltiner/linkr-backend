@@ -36,10 +36,10 @@ export async function createSession(token, userId) {
   );
 }
 
-export async function deleteSession(token) {
+export async function deleteSession(id) {
   return connection.query(
     `
-     DELETE FROM sessions WHERE token=$1;`,
-    [token]
+     DELETE FROM sessions WHERE id=$1;`,
+    [id]
   );
 }

@@ -2,7 +2,6 @@ import { connection } from "../dbStrategy/postgres.js";
 
 export async function createPost(req, res) {
   const post = req.body;
-  req.email = "r@r.com";
   const email = req.email;
 
   try {

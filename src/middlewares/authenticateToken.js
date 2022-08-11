@@ -11,7 +11,6 @@ export default async function authenticateToken(req, res, next) {
   console.log(token);
 
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
-    console.log(err, "err");
     if (err) return res.sendStatus(401);
     req.email = user.email;
   });

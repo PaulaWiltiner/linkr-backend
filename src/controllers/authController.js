@@ -20,7 +20,7 @@ export default async function signUp(req, res) {
   );
 
   if (isEmail.length > 0) {
-    res.sendStatus(409);
+    res.status(409).send("email is already being used");
     return;
   }
   const hashPassword = bcrypt.hashSync(password, 10);
@@ -37,11 +37,13 @@ export async function login(req, res) {
 
   const { rows: users } = await getUserByEmail(email);
   const [user] = users;
+
   if (!user) {
     return res.sendStatus(401);
   }
   if (bcrypt.compareSync(password, user.password)) {
-    const token = jwt.sign({ email: users.email }, process.env.ACCESS_TOKEN);
+    users[0].email;
+    const token = jwt.sign({ email: users[0].email }, process.env.ACCESS_TOKEN);
     await createSession(token, user.id);
     return res
       .send({ username: user.username, picture: user.picture, token })
@@ -54,7 +56,7 @@ export async function login(req, res) {
 export async function logout(req, res) {
   try {
     const { session } = res.locals;
-    await deleteSession(session.token);
+    await deleteSession(session.id);
     return res.sendStatus(200);
   } catch (err) {
     res.sendStatus(401);
