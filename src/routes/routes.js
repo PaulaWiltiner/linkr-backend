@@ -6,5 +6,3 @@ export const router = Router();
 
 router.use(postsRouter);
 router.use(authRouter);
-
-
