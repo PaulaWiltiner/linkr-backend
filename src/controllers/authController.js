@@ -12,14 +12,13 @@ export default async function signUp(req, res){
 
     const {rows:isEmail} = await connection.query(`SELECT email FROM users WHERE email = $1`, [email])
 
-    console.log(isEmail);
     if(isEmail.length > 0){
         
         res.sendStatus(409);
         return;
     }
     const hashPassword=bcrypt.hashSync(password, 10);
-    await connection.query('INSERT INTO links (picture, username, email, password) VALUES ($1, $2, $3, $4)', [picture, username, email, hashPassword]);
+    await connection.query('INSERT INTO users (picture, username, email, password) VALUES ($1, $2, $3, $4)', [picture, username, email, hashPassword]);
 
     res.sendStatus(201);
 }
