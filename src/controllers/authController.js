@@ -12,6 +12,7 @@ export default async function signUp(req, res){
 
     const {rows:isEmail} = await connection.query(`SELECT email FROM users WHERE email = $1`, [email])
 
+    console.log(isEmail);
     if(isEmail.length > 0){
         
         res.sendStatus(409);
