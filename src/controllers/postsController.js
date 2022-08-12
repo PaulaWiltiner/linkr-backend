@@ -81,7 +81,7 @@ export async function createPost(req, res) {
 async function pull(item) {
   let result;
   try {
-    result = await urlMetaData(item);
+    result = await urlMetaData(item.link);
   } catch (err) {
     result = {
       title: "",

@@ -1,6 +1,7 @@
 import { connection } from "../dbStrategy/postgres.js";
 
 export async function getPosts() {
+  console.log("ola");
   const { rows: posts } = await connection.query(
     `
     SELECT  posts.id, posts.link, posts.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
