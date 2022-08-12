@@ -1,6 +1,8 @@
 import { connection } from "../dbStrategy/postgres.js";
 import { getPosts } from "../repositories/postsRepository.js";
 import urlMetaData from "url-metadata";
+import { deletePostById, getPosts } from "../repositories/postsRepository.js";
+
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -103,4 +105,12 @@ export async function pullPosts(req, res) {
   } catch (error) {
     return res.sendStatus(500);
   }
+}
+
+export async function deletePost(req, res) {
+  const { id } = req.params;
+
+  await deletePostById(id);
+
+  return res.status(200).send("Post deleted!");
 }
