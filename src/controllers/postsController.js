@@ -86,3 +86,7 @@ export async function pullPosts(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function updatePost(req, res){
+  
+}
