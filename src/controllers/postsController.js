@@ -98,6 +98,5 @@ export async function updatePost(req, res){
   } catch (error) {
     return res.sendStatus(500);
   }
-  
 
 }
