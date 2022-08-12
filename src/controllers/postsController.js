@@ -86,3 +86,10 @@ export async function pullPosts(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function deletePost(req, res) {
+  const { id } = req.params;
+  const email = req.email;
+
+  return res.sendStatus(200);
+}

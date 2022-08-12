@@ -14,3 +14,11 @@ export async function getPosts() {
 
   return posts;
 }
+export async function getPostById(id) {
+  const { rows: post } = await connection.query(
+    `SELECT * FROM "userPosts" WHERE "postId" = $1`,
+    [id]
+  );
+
+  return post;
+}
