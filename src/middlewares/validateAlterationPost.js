@@ -1,10 +1,10 @@
-import { connection } from "../dbStrategy/postgres.js";
 import { getPostById } from "../repositories/postsRepository.js";
 import { getUserByEmail } from "../repositories/usersRepository.js";
 
-export async function validateDeletePost(req, res, next) {
+export async function validateAlterationPost(req, res, next) {
   const email = req.email;
   const { id } = req.params;
+
   const {
     rows: [user],
   } = await getUserByEmail(email);
