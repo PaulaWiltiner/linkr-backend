@@ -10,7 +10,7 @@ export async function getSession(token) {
   `,
     [token]
   );
-
+  
   return session;
 }
 

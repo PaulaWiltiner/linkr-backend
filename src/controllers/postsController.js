@@ -114,6 +114,19 @@ export async function pullPosts(req, res) {
   }
 }
 
+export async function updatePost(req, res){
+  const {description} = req.body;
+  const {id} = req.params;
+
+  try {
+    await connection.query(`UPDATE posts SET description = $2 WHERE id = $1`, [id, description]);
+
+    return res.status(200).send("successfully updated");
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+
+}
 export async function deletePost(req, res) {
   const { id } = req.params;
 
