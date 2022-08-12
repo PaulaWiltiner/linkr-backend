@@ -7,4 +7,4 @@ import authenticateToken from "../middlewares/authenticateToken.js";
 export const postsRouter = Router();
 postsRouter.post("/post", authenticateToken, validateCreatePost, createPost);
 postsRouter.get("/posts", pullPosts);
-postsRouter.put("/post/:id", authenticateToken, validateUpdatePost, updatePost)
+postsRouter.put("/post/:id", authenticateToken, validateUpdatePost, updatePost);
