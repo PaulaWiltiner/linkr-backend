@@ -5,7 +5,7 @@ import {
   pullPosts,
 } from "../controllers/postsController.js";
 import { validateCreatePost } from "../middlewares/validateCreatePost.js";
-import { validateAlterationPost } from "../middlewares/validateDeletePost.js";
+import { validateAlterationPost } from "../middlewares/validateAlterationPost.js";
 import authenticateToken from "../middlewares/authenticateToken.js";
 
 export const postsRouter = Router();
