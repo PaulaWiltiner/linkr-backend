@@ -9,15 +9,18 @@ export default async function authenticateToken(req, res, next) {
 
   if (token == null) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.ACCESS_TOKEN, (err, user) => {
-    if (err) return res.sendStatus(401);
+  try {
+    const user = jwt.verify(token, process.env.ACCESS_TOKEN);
     req.email = user.email;
-  });
-  
+    next();
+  } 
+  catch{
+    return res.sendStatus(401);
+  }
+ 
   const session = await getSession(token);
-   console.log(!session);
+ 
   if (!session) {
-   
     return res.sendStatus(401);
   }
 
