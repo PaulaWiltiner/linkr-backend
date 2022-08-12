@@ -1,5 +1,5 @@
 import { connection } from "../dbStrategy/postgres.js";
-import { getPosts } from "../repositories/postsRepository.js";
+import { deletePostById, getPosts } from "../repositories/postsRepository.js";
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -89,7 +89,8 @@ export async function pullPosts(req, res) {
 
 export async function deletePost(req, res) {
   const { id } = req.params;
-  const email = req.email;
 
-  return res.sendStatus(200);
+  await deletePostById(id);
+
+  return res.status(200).send("Post deleted!");
 }

@@ -22,3 +22,10 @@ export async function getPostById(id) {
 
   return post;
 }
+export async function deletePostById(id) {
+  await connection.query(`DELETE FROM "userPosts" WHERE "postId" = $1`, [id]);
+  await connection.query(`DELETE FROM "postHashtags" WHERE "postId" = $1`, [
+    id,
+  ]);
+  await connection.query(`DELETE FROM posts WHERE id = $1`, [id]);
+}
