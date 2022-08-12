@@ -88,5 +88,13 @@ export async function pullPosts(req, res) {
 }
 
 export async function updatePost(req, res){
-  
+
+  const {description} = req.body;
+
+  const {id} = req.params;
+
+  console.log(id);
+
+  await connection.query(`UPDATE post SET description = ${description} WHERE id = $1`, [id]);
+
 }
