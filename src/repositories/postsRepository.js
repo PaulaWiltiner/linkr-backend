@@ -14,3 +14,18 @@ export async function getPosts() {
 
   return posts;
 }
+export async function getPostById(id) {
+  const { rows: post } = await connection.query(
+    `SELECT * FROM "userPosts" WHERE "postId" = $1`,
+    [id]
+  );
+
+  return post;
+}
+export async function deletePostById(id) {
+  await connection.query(`DELETE FROM "userPosts" WHERE "postId" = $1`, [id]);
+  await connection.query(`DELETE FROM "postHashtags" WHERE "postId" = $1`, [
+    id,
+  ]);
+  await connection.query(`DELETE FROM posts WHERE id = $1`, [id]);
+}
