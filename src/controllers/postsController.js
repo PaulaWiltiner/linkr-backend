@@ -1,5 +1,6 @@
 import { connection } from "../dbStrategy/postgres.js";
-import { getPosts } from "../repositories/postsRepository.js";
+import urlMetaData from "url-metadata";
+import { deletePostById, getPosts } from "../repositories/postsRepository.js";
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -77,12 +78,38 @@ export async function createPost(req, res) {
   }
 }
 
+async function pull(item) {
+  let result;
+  try {
+    result = await urlMetaData(item);
+  } catch (err) {
+    result = {
+      title: "",
+      description: "",
+      image: "",
+      url: "",
+    };
+  }
+  item["link"] = {
+    title: result.title,
+    description: result.description,
+    image: result.image,
+    url: result.url,
+  };
+
+  return item;
+}
+
 export async function pullPosts(req, res) {
   try {
     const postList = await getPosts();
-    return res.send(postList).status(200);
+    const newList = [];
+    for (let item of postList) {
+      const resp = await pull(item);
+      newList.push(resp);
+    }
+    return res.send(newList).status(200);
   } catch (error) {
-    console.log(error);
     return res.sendStatus(500);
   }
 }
@@ -99,4 +126,11 @@ export async function updatePost(req, res){
     return res.sendStatus(500);
   }
 
+}
+export async function deletePost(req, res) {
+  const { id } = req.params;
+
+  await deletePostById(id);
+
+  return res.status(200).send("Post deleted!");
 }
