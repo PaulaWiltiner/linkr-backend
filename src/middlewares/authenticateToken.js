@@ -12,6 +12,7 @@ export default async function authenticateToken(req, res, next) {
   try {
     const user = jwt.verify(token, process.env.ACCESS_TOKEN);
     req.email = user.email;
+    res.locals.userId = user.id;
   } 
   catch{
     return res.sendStatus(401);
