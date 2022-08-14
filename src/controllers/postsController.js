@@ -5,7 +5,11 @@ import { deletePostById, getPosts } from "../repositories/postsRepository.js";
 export async function createPost(req, res) {
   const post = req.body;
   const email = req.email;
-
+  const {
+    title: titleURL,
+    description: descriptionURL,
+    image: imageURL,
+  } = req.infosUrl;
   try {
     let arrayHashtagsId = [];
     const descriptionArray = post.description.split(" ");
@@ -39,8 +43,8 @@ export async function createPost(req, res) {
     const {
       rows: [postId],
     } = await connection.query(
-      `INSERT INTO posts (description, link) VALUES ($1, $2) RETURNING id`,
-      [post.description, post.link]
+      `INSERT INTO posts (description, link, titleURL, descriptionURL , imageURL) VALUES ($1, $2, $3,$4,$5) RETURNING id`,
+      [post.description, post.link, titleURL, descriptionURL, imageURL]
     );
 
     hashtagsToInsert.map(async (hashtag) => {
@@ -78,54 +82,29 @@ export async function createPost(req, res) {
   }
 }
 
-async function pull(item) {
-  let result;
-  try {
-    result = await urlMetaData(item.link);
-  } catch (err) {
-    result = {
-      title: "",
-      description: "",
-      image: "",
-      url: "",
-    };
-  }
-  item["link"] = {
-    title: result.title,
-    description: result.description,
-    image: result.image,
-    url: result.url,
-  };
-
-  return item;
-}
-
 export async function pullPosts(req, res) {
   try {
     const postList = await getPosts();
-    const newList = [];
-    for (let item of postList) {
-      const resp = await pull(item);
-      newList.push(resp);
-    }
-    return res.send(newList).status(200);
+    return res.send(postList).status(200);
   } catch (error) {
     return res.sendStatus(500);
   }
 }
 
-export async function updatePost(req, res){
-  const {description} = req.body;
-  const {id} = req.params;
+export async function updatePost(req, res) {
+  const { description } = req.body;
+  const { id } = req.params;
 
   try {
-    await connection.query(`UPDATE posts SET description = $2 WHERE id = $1`, [id, description]);
+    await connection.query(`UPDATE posts SET description = $2 WHERE id = $1`, [
+      id,
+      description,
+    ]);
 
     return res.status(200).send("successfully updated");
   } catch (error) {
     return res.sendStatus(500);
   }
-
 }
 export async function deletePost(req, res) {
   const { id } = req.params;

@@ -1,10 +1,9 @@
 import { connection } from "../dbStrategy/postgres.js";
 
 export async function getPosts() {
-  console.log("ola");
   const { rows: posts } = await connection.query(
     `
-    SELECT  posts.id, posts.link, posts.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
+    SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'link',posts."link", 'image',posts."imageurl") AS link, posts.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
 					  (SELECT json_build_object('count',COUNT("pL".id) ,'usernameList' ,json_agg(users.username) ) FROM (SELECT * FROM "postLikes" ORDER BY "createdAt" DESC) AS "pL"
     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes" FROM  posts
     JOIN "userPosts" ON "userPosts"."postId"=posts.id
