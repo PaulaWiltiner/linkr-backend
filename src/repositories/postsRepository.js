@@ -3,7 +3,7 @@ import { connection } from "../dbStrategy/postgres.js";
 export async function getPosts(userId) {
   const { rows: posts } = await connection.query(
     `
-    SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'link',posts."link", 'image',posts."imageurl") AS link,
+    SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
      posts.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
                        (SELECT json_build_object('count',COUNT("pL".id) ,
 												 'usernameList' , (array_agg(users.username))[1:3] ,
