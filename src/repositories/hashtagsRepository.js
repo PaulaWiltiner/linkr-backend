@@ -5,7 +5,7 @@ export async function getOneHashtag(userId, hashtag) {
     `
     SELECT "newTab"."hashtagId" AS id , trending.hashtag, 
     json_agg("newTab"."postL") AS "postList"  FROM (SELECT "postHashtags"."hashtagId", json_build_object('id', posts.id , 
-       'link',posts.link,'description',posts.description
+       'link',json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl"),'description',posts.description
        ,'user', json_build_object('id',users.id ,'username',users.username, 'picture',users.picture)
         ,'postLikes', (SELECT json_build_object('count',COUNT("pL".id) ,
        'usernameList' , (array_agg(users.username))[1:3] ,
