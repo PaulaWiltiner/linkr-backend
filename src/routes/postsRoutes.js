@@ -25,7 +25,7 @@ postsRouter.post(
   validateUrl,
   createPost
 );
-postsRouter.get("/posts", pullPosts);
+postsRouter.get("/posts",authenticateToken, pullPosts);
 postsRouter.put(
   "/post/:id",
   authenticateToken,
