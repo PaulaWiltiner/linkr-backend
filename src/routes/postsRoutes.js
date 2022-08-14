@@ -27,7 +27,7 @@ postsRouter.post(
   createPost
 );
 postsRouter.get("/posts", authenticateToken, pullPosts);
-postsRouter.get("/posts/:username", postsByUsername);
+postsRouter.get("/user/:username", postsByUsername);
 postsRouter.put(
   "/post/:id",
   authenticateToken,
