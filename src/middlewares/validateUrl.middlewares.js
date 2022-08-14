@@ -7,7 +7,7 @@ export async function validateUrl(req, res, next) {
   } catch (err) {
     return res.status(422).send("Invalid URL");
   }
-  req.infosUrl = {
+  res.infosUrl = {
     title: result.title,
     description: result.description,
     image: result.image,

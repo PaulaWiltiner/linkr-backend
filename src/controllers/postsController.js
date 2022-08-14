@@ -1,6 +1,10 @@
 import { connection } from "../dbStrategy/postgres.js";
-import urlMetaData from "url-metadata";
-import { createLike, deleteLike, deletePostById, getPosts } from "../repositories/postsRepository.js";
+import {
+  createLike,
+  deleteLike,
+  deletePostById,
+  getPosts,
+} from "../repositories/postsRepository.js";
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -9,7 +13,7 @@ export async function createPost(req, res) {
     title: titleURL,
     description: descriptionURL,
     image: imageURL,
-  } = req.infosUrl;
+  } = res.infosUrl;
   try {
     let arrayHashtagsId = [];
     const descriptionArray = post.description.split(" ");
@@ -84,7 +88,7 @@ export async function createPost(req, res) {
 
 export async function pullPosts(req, res) {
   try {
-    const postList = await getPosts();
+    const postList = await getPosts(res.locals.userId);
     return res.send(postList).status(200);
   } catch (error) {
     return res.sendStatus(500);
