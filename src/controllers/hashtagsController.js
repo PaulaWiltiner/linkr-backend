@@ -2,8 +2,10 @@ import { getOneHashtag } from "../repositories/hashtagsRepository.js";
 
 export async function oneHashtag(req, res) {
   const { hashtag } = req.params;
-  console.log(hashtag);
-  const { rows: hashtagList } = await getOneHashtag(res.locals.userId, hashtag);
+  const { rows: hashtagList } = await getOneHashtag(
+    res.locals.userId,
+    "#" + hashtag
+  );
 
   if (!hashtagList) {
     return res.sendStatus(404);
