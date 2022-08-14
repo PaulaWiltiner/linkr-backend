@@ -3,6 +3,7 @@ import {
   createPost,
   deletePost,
   likePost,
+  postsByUsername,
   pullPosts,
   unlikePost,
   updatePost,
@@ -25,7 +26,8 @@ postsRouter.post(
   validateUrl,
   createPost
 );
-postsRouter.get("/posts",authenticateToken, pullPosts);
+postsRouter.get("/posts", authenticateToken, pullPosts);
+postsRouter.get("/posts/:username", postsByUsername);
 postsRouter.put(
   "/post/:id",
   authenticateToken,

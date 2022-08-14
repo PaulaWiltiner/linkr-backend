@@ -4,7 +4,12 @@ import {
   deleteLike,
   deletePostById,
   getPosts,
+  getPostsByUsername,
 } from "../repositories/postsRepository.js";
+import {
+  getUserById,
+  getUserByUsername,
+} from "../repositories/usersRepository.js";
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -136,6 +141,24 @@ export async function unlikePost(req, res) {
     await deleteLike(postId, userId);
     return res.sendStatus(200);
   } catch (error) {
+    return res.sendStatus(500);
+  }
+}
+
+export async function postsByUsername(req, res) {
+  const { username } = req.params;
+
+  try {
+    const {
+      rows: [user],
+    } = await getUserByUsername(username);
+
+    if (!user) return res.sendStatus(404);
+
+    const userPosts = await getPostsByUsername(user.id, username);
+    return res.status(200).send(userPosts);
+  } catch (error) {
+    console.log(error);
     return res.sendStatus(500);
   }
 }
