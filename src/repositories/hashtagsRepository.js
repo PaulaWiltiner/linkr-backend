@@ -27,5 +27,9 @@ export async function getOneHashtag(userId, hashtag) {
 }
 
 export async function getHashtags(id) {
-  return connection.query(``);
+  return connection.query(`
+  SELECT COUNT ("hashtagId"), trending.hashtag FROM "postHashtags"
+  JOIN trending ON trending.id="postHashtags"."hashtagId"
+  GROUP BY "postHashtags"."hashtagId",trending.hashtag
+  ORDER BY "count" DESC LIMIT 10`);
 }
