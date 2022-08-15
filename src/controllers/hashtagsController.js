@@ -1,4 +1,7 @@
-import { getOneHashtag } from "../repositories/hashtagsRepository.js";
+import {
+  getOneHashtag,
+  getHashtags,
+} from "../repositories/hashtagsRepository.js";
 
 export async function oneHashtag(req, res) {
   const { hashtag } = req.params;
@@ -12,4 +15,13 @@ export async function oneHashtag(req, res) {
   }
 
   return res.send(hashtagList).status(200);
+}
+
+export async function pullHashtags(req, res) {
+  try {
+    const { rows: hashtagList } = await getHashtags();
+    return res.send(hashtagList).status(200);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 }
