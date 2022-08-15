@@ -11,3 +11,7 @@ export async function getUserByUsername(username) {
     username,
   ]);
 }
+
+export async function getAllUsers() {
+  return connection.query(`SELECT id, username, picture FROM users`);
+}
