@@ -57,7 +57,12 @@ export async function login(req, res) {
     );
     await createSession(token, user.id);
     return res
-      .send({ username: user.username, picture: user.picture, token })
+      .send({
+        userId: user.id,
+        username: user.username,
+        picture: user.picture,
+        token,
+      })
       .status(200);
   }
 

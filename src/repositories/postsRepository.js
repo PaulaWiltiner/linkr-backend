@@ -25,7 +25,7 @@ export async function getPosts(userId) {
 
   return posts;
 }
-export async function getPostsByUsername(userId, username) {
+export async function getPostsByUserId(userId) {
   const { rows: posts } = await connection.query(
     `
     SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
@@ -41,10 +41,10 @@ export async function getPostsByUsername(userId, username) {
      FROM posts
      JOIN "userPosts" ON "userPosts"."postId"=posts.id
      JOIN users ON "userPosts"."userId"=users.id
-     WHERE users.username = $2
+     WHERE users.id = $2
      ORDER BY posts.id DESC LIMIT 20;
   `,
-    [userId, username]
+    [userId, userId]
   );
 
   return posts;

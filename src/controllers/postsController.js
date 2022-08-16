@@ -4,12 +4,9 @@ import {
   deleteLike,
   deletePostById,
   getPosts,
-  getPostsByUsername,
+  getPostsByUserId,
 } from "../repositories/postsRepository.js";
-import {
-  getUserById,
-  getUserByUsername,
-} from "../repositories/usersRepository.js";
+import { getUserById } from "../repositories/usersRepository.js";
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -149,17 +146,19 @@ export async function unlikePost(req, res) {
   }
 }
 
-export async function postsByUsername(req, res) {
-  const { username } = req.params;
+export async function postsByUserId(req, res) {
+  const { id } = req.params;
 
   try {
     const {
       rows: [user],
-    } = await getUserByUsername(username);
+    } = await getUserById(id);
 
     if (!user) return res.sendStatus(404);
 
-    const userPosts = await getPostsByUsername(user.id, username);
+    console.log(user);
+    const userPosts = await getPostsByUserId(user.id);
+    console.log(userPosts);
     return res.status(200).send(userPosts);
   } catch (error) {
     console.log(error);
