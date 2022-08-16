@@ -17,6 +17,7 @@ import {
   likeMiddleware,
   unlikeMiddleware,
 } from "../middlewares/likeMiddleware.js";
+import { validateFollowers } from "../middlewares/validateFollowers.js";
 
 export const postsRouter = Router();
 postsRouter.post(
@@ -26,7 +27,7 @@ postsRouter.post(
   validateUrl,
   createPost
 );
-postsRouter.get("/posts", authenticateToken, pullPosts);
+postsRouter.get("/posts", authenticateToken, validateFollowers, pullPosts);
 postsRouter.get("/user/:username", postsByUsername);
 postsRouter.put(
   "/post/:id",

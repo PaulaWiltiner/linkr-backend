@@ -15,8 +15,10 @@ export async function getPosts(userId) {
      JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes"
      FROM posts
      JOIN "userPosts" ON "userPosts"."postId"=posts.id
-     JOIN users ON "userPosts"."userId"=users.id
-     ORDER BY posts.id DESC LIMIT 20;
+	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
+     JOIN users ON "userFollowers".followed=users.id
+	   WHERE "userFollowers".follower=$1
+     ORDER BY posts.id DESC LIMIT 10;
   `,
     [userId]
   );
