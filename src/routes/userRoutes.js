@@ -3,4 +3,4 @@ import { getUsers } from "../controllers/usersController.js";
 
 export const userRouter = Router();
 
-userRouter.get("/users", getUsers);
+userRouter.get("/users/:username", getUsers);

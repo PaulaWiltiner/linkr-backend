@@ -12,6 +12,12 @@ export async function getUserByUsername(username) {
   ]);
 }
 
-export async function getAllUsers() {
-  return connection.query(`SELECT id, username, picture FROM users`);
+export async function searchUsers(username) {
+  return connection.query(`
+    SELECT users.id, users.username, users.picture 
+    FROM users
+    WHERE username ILIKE $1
+    ORDER BY username ASC;`, 
+    [`${username}%`]
+  );
 }
