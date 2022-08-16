@@ -28,7 +28,6 @@ postsRouter.post(
   createPost
 );
 postsRouter.get("/posts", authenticateToken, validateFollowers, pullPosts);
-postsRouter.get("/user/:username", postsByUsername);
 postsRouter.get("/user/:id", postsByUserId);
 
 postsRouter.put(
