@@ -6,18 +6,14 @@ export async function getUserByEmail(email) {
 export async function getUserById(id) {
   return connection.query(`SELECT * FROM users WHERE id = $1`, [id]);
 }
-export async function getUserByUsername(username) {
-  return connection.query(`SELECT * FROM users WHERE username = $1`, [
-    username,
-  ]);
-}
 
 export async function searchUsers(username) {
-  return connection.query(`
+  return connection.query(
+    `
     SELECT users.id, users.username, users.picture 
     FROM users
     WHERE username ILIKE $1
-    ORDER BY username ASC;`, 
+    ORDER BY username ASC;`,
     [`${username}%`]
   );
 }
