@@ -5,10 +5,7 @@ import {
   deleteSession,
 } from "../repositories/authRepository.js";
 import jwt from "jsonwebtoken";
-import {
-  getUserByEmail,
-  getUserByUsername,
-} from "../repositories/usersRepository.js";
+import { getUserByEmail } from "../repositories/usersRepository.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -26,10 +23,6 @@ export default async function signUp(req, res) {
     res.status(409).send("email is already being used");
     return;
   }
-
-  const { rows: hasUsername } = await getUserByUsername(username);
-
-  if (hasUsername) return res.status(401).send("Username already exists!");
 
   const hashPassword = bcrypt.hashSync(password, 10);
   await connection.query(
