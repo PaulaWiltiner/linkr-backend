@@ -5,6 +5,7 @@ import {
   deletePostById,
   getPosts,
   getPostsByUserId,
+  getPostsWithoutLimit,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
 
@@ -164,4 +165,12 @@ export async function postsByUserId(req, res) {
     console.log(error);
     return res.sendStatus(500);
   }
+}
+
+export async function reloadPosts(req, res) {
+  const userId = res.locals.userId;
+
+  const posts = await getPostsWithoutLimit(userId);
+
+  return res.status(200).send(posts);
 }
