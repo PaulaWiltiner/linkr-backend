@@ -6,8 +6,7 @@ import {
 } from "../repositories/authRepository.js";
 import jwt from "jsonwebtoken";
 import {
-  getUserByEmail,
-  getUserByUsername,
+  getUserByEmail
 } from "../repositories/usersRepository.js";
 import dotenv from "dotenv";
 dotenv.config();
