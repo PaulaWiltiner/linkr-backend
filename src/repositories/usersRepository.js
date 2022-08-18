@@ -16,7 +16,7 @@ export async function searchUsers(username, userId) {
     WHERE "userFollowers".follower = $2) AS foll 
     WHERE username ILIKE $1
     GROUP BY users.id
-    ORDER BY "isFollowed", username ASC`,
+    ORDER BY "isFollowing", username ASC`,
     [`${username}%`, userId]
   );
 }
