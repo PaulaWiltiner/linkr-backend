@@ -18,11 +18,15 @@ export async function getPosts(userId) {
 	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
      JOIN users ON "userFollowers".followed=users.id
 	   WHERE "userFollowers".follower=$1
-     ORDER BY posts.id DESC LIMIT 10;
-  `,
-    [userId]
-  );
-
+     ORDER BY posts.id DESC 
+     LIMIT 10;
+     `,
+     [userId]
+     );
+     /* 
+     OFFSET $2; */
+    /* [userId, start] */
+  console.log(posts);
   return posts;
 }
 export async function getPostsByUserId(userId) {

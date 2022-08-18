@@ -88,9 +88,22 @@ export async function createPost(req, res) {
 }
 
 export async function pullPosts(req, res) {
+  //const { page } = req.query;
+
   try {
+    /* if ((page && page < 1) || !page) {
+      console.log('Número da página inválido!');
+      return res.sendStatus(400);
+    }
+
+    const limit = 10;
+    const start = (page - 1) * limit; */
+    
+    /* const postList = await getPosts(res.locals.userId, start); */
     const postList = await getPosts(res.locals.userId);
-    return res.send(postList).status(200);
+  
+    /* res.status(200).send([...postList].slice(start, end)); */
+    res.status(200).send(postList);
   } catch (error) {
     return res
       .status(500)
