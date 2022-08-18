@@ -8,7 +8,9 @@ import {
   reloadPosts,
   unlikePost,
   updatePost,
+  getComments,
 } from "../controllers/postsController.js";
+import { validatePostComments } from "../middlewares/validatePostComments.js";
 import { validateCreatePost } from "../middlewares/validateCreatePost.js";
 import { validateAlterationPost } from "../middlewares/validateAlterationPost.js";
 import authenticateToken from "../middlewares/authenticateToken.js";
@@ -57,3 +59,9 @@ postsRouter.delete(
   unlikePost
 );
 postsRouter.get("/posts/reload", authenticateToken, reloadPosts);
+postsRouter.get(
+  "/posts/:postId/comments",
+  authenticateToken,
+  validatePostComments,
+  getComments
+);

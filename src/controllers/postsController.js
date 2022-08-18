@@ -174,3 +174,8 @@ export async function reloadPosts(req, res) {
 
   return res.status(200).send(posts);
 }
+export async function getComments(req, res) {
+  const { postId } = req.params;
+
+  return res.status(200).send(postId);
+}
