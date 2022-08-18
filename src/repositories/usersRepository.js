@@ -11,7 +11,7 @@ export async function getUserById(id) {
 export async function searchUsers(username, userId) {
   return connection.query(
     `
-    SELECT users.id, users.username, users.picture, array_agg(COALESCE((foll.followed = users.id), 'false')) FILTER (WHERE COALESCE((foll.followed = users.id), 'false')) AS "isFollowed" 
+    SELECT users.id, users.username, users.picture, array_agg(COALESCE((foll.followed = users.id), 'false')) FILTER (WHERE COALESCE((foll.followed = users.id), 'false')) AS "isFollowing" 
     FROM users,(SELECT "userFollowers".followed FROM "userFollowers"
     WHERE "userFollowers".follower = $2) AS foll 
     WHERE username ILIKE $1
