@@ -176,6 +176,27 @@ export async function reloadPosts(req, res) {
 }
 export async function getComments(req, res) {
   const { postId } = req.params;
+  const { userId } = res.locals.userId;
+  const allComments = res.locals.comments;
 
-  return res.status(200).send(postId);
+  const {
+    rows: [qtdComments],
+  } = await connection.query(
+    `SELECT COUNT("postId") as qtd FROM "postComments" WHERE "postId" = $1 GROUP BY "postId"`,
+    [postId]
+  );
+  const comments = qtdComments ? comments.qtd : "0";
+
+  const { rows: followersComments } = await connection.query(
+    `SELECT follower as "followerId" FROM "userFollowers" WHERE followed = $1`,
+    [userId]
+  );
+
+  return res.status(200).send({
+    postAuthor: userId,
+    userFollowers: followersComments,
+    postId: postId,
+    comments: allComments,
+    qtdOfComments: comments,
+  });
 }
