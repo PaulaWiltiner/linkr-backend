@@ -5,9 +5,12 @@ import {
   likePost,
   postsByUserId,
   pullPosts,
+  reloadPosts,
   unlikePost,
   updatePost,
+  getComments,
 } from "../controllers/postsController.js";
+import { validatePostComments } from "../middlewares/validatePostComments.js";
 import { validateCreatePost } from "../middlewares/validateCreatePost.js";
 import { validateAlterationPost } from "../middlewares/validateAlterationPost.js";
 import authenticateToken from "../middlewares/authenticateToken.js";
@@ -17,15 +20,57 @@ import {
   likeMiddleware,
   unlikeMiddleware,
 } from "../middlewares/likeMiddleware.js";
-import { validateFollowers } from "../middlewares/validateFollowers.js";
+import {
+  validateFollowers,
+  validatePostsFollowers,
+} from "../middlewares/validateFollowers.js";
 
 export const postsRouter = Router();
-postsRouter.post("/post", authenticateToken, validateCreatePost, validateUrl, createPost);
-postsRouter.get("/posts", authenticateToken, validateFollowers, pullPosts);
+postsRouter.post(
+  "/post",
+  authenticateToken,
+  validateCreatePost,
+  validateUrl,
+  createPost
+);
+postsRouter.get(
+  "/posts",
+  authenticateToken,
+  validateFollowers,
+  validatePostsFollowers,
+  pullPosts
+);
 postsRouter.get("/user/:id", postsByUserId);
 
-postsRouter.put("/post/:id", authenticateToken, validateUpdatePost, validateAlterationPost, updatePost);
-postsRouter.delete("/posts/:id", authenticateToken, validateAlterationPost, deletePost);
-postsRouter.post("/post/like/:postId", authenticateToken, likeMiddleware, likePost);
-postsRouter.delete("/post/like/:postId", authenticateToken, unlikeMiddleware, unlikePost
+postsRouter.put(
+  "/post/:id",
+  authenticateToken,
+  validateUpdatePost,
+  validateAlterationPost,
+  updatePost
+);
+postsRouter.delete(
+  "/posts/:id",
+  authenticateToken,
+  validateAlterationPost,
+  deletePost
+);
+postsRouter.post(
+  "/post/like/:postId",
+  authenticateToken,
+  likeMiddleware,
+  likePost
+);
+postsRouter.delete(
+  "/post/like/:postId",
+  authenticateToken,
+  unlikeMiddleware,
+  unlikePost
+);
+postsRouter.get("/posts/reload", authenticateToken, reloadPosts);
+postsRouter.get(
+  "/posts/:postId/comments",
+  authenticateToken,
+  validatePostComments,
+  getComments
 );

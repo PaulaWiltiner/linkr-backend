@@ -5,6 +5,7 @@ import {
   deletePostById,
   getPosts,
   getPostsByUserId,
+  getPostsWithoutLimit,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
 
@@ -90,13 +91,14 @@ export async function createPost(req, res) {
 export async function pullPosts(req, res) {
   try {
     const postList = await getPosts(res.locals.userId);
-    return res.send(postList).status(200);
-  } catch (error) {
     return res
-      .status(500)
-      .send(
-        "An error occured while trying to fetch the posts, please refresh the page"
-      );
+      .send({
+        errFollower: res.locals.validateErrFollower,
+        postList: postList,
+      })
+      .status(200);
+  } catch (error) {
+    return res.sendStatus(500);
   }
 }
 
@@ -164,4 +166,33 @@ export async function postsByUserId(req, res) {
     console.log(error);
     return res.sendStatus(500);
   }
+}
+
+export async function reloadPosts(req, res) {
+  const userId = res.locals.userId;
+
+  const posts = await getPostsWithoutLimit(userId);
+
+  return res.status(200).send(posts);
+}
+export async function getComments(req, res) {
+  const { postId } = req.params;
+  const { username } = res.locals.userId;
+  const allComments = res.locals.comments;
+
+  const {
+    rows: [qtdComments],
+  } = await connection.query(
+    `SELECT COUNT("postId") as qtd FROM "postComments" WHERE "postId" = $1 GROUP BY "postId"`,
+    [postId]
+  );
+
+  const comments = qtdComments ? qtdComments.qtd : 0;
+
+  return res.status(200).send({
+    postAuthor: username,
+    postId: postId,
+    comments: res.locals.comments,
+    qtdOfComments: comments,
+  });
 }
