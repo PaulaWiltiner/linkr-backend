@@ -5,7 +5,7 @@ export async function validatePostComments(req, res, next) {
   const commentsArray = [];
 
   const { rows: comments } = await connection.query(
-    `SELECT "pC".comment, "pC"."userId" as "commentUser", "uP"."userId"
+    `SELECT "pC".id, "pC".comment, "pC"."userId" as "commentUser", "uP"."userId"
     FROM "postComments" as "pC"
     JOIN posts ON posts.id = "pC"."postId"
     JOIN "userPosts" as "uP" ON "uP"."postId" = posts.id
@@ -41,6 +41,7 @@ export async function validatePostComments(req, res, next) {
     );
 
     commentsArray.push({
+      commentId: comments[i].id,
       postAuthor: comments[i].userId,
       commentUserInformation: {
         userId: comments[i].commentUser,

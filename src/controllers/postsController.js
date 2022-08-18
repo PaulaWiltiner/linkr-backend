@@ -178,7 +178,6 @@ export async function reloadPosts(req, res) {
 export async function getComments(req, res) {
   const { postId } = req.params;
   const { username } = res.locals.userId;
-  const allComments = res.locals.comments;
 
   const {
     rows: [qtdComments],
