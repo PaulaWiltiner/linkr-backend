@@ -98,11 +98,7 @@ export async function pullPosts(req, res) {
       })
       .status(200);
   } catch (error) {
-    return res
-      .status(500)
-      .send(
-        "An error occured while trying to fetch the posts, please refresh the page"
-      );
+    return res.sendStatus(500);
   }
 }
 

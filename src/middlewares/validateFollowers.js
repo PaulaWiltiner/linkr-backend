@@ -20,8 +20,7 @@ export async function validateFollowers(req, res, next) {
 export async function validatePostsFollowers(req, res, next) {
   try {
     const result = await getOnePostFollower(res.locals.userId);
-    res.locals.validateErrFollower = "";
-    if (result.length === 0) {
+    if (res.locals.validateErrFollower === "" && result.length === 0) {
       res.locals.validateErrFollower = "No posts found from your friends";
     }
   } catch (err) {
