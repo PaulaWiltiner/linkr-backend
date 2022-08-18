@@ -26,7 +26,6 @@ export async function getPosts(userId) {
      /* 
      OFFSET $2; */
     /* [userId, start] */
-  console.log(posts);
   return posts;
 }
 export async function getPostsByUserId(userId) {
