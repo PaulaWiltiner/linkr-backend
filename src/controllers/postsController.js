@@ -91,7 +91,12 @@ export async function createPost(req, res) {
 export async function pullPosts(req, res) {
   try {
     const postList = await getPosts(res.locals.userId);
-    return res.send(postList).status(200);
+    return res
+      .send({
+        errFollower: res.locals.validateErrFollower,
+        postList: postList,
+      })
+      .status(200);
   } catch (error) {
     return res
       .status(500)
