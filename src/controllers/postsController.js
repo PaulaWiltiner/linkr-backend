@@ -158,9 +158,9 @@ export async function postsByUserId(req, res) {
 
     if (!user) return res.sendStatus(404);
 
-    console.log(user);
+ 
     const userPosts = await getPostsByUserId(user.id);
-    console.log(userPosts);
+
     return res.status(200).send(userPosts);
   } catch (error) {
     console.log(error);
