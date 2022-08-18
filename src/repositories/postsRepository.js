@@ -16,8 +16,9 @@ export async function getPosts(userId) {
      FROM posts
      JOIN "userPosts" ON "userPosts"."postId"=posts.id
 	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
-     JOIN users ON "userFollowers".followed=users.id
-	   WHERE "userFollowers".follower=$1
+     JOIN users ON "userFollowers".followed=users.id 
+	   WHERE "userFollowers".follower=$1 OR users.id=$1
+	   GROUP BY posts.id,users.id 
      ORDER BY posts.id DESC LIMIT 10;
   `,
     [userId]
@@ -25,6 +26,7 @@ export async function getPosts(userId) {
 
   return posts;
 }
+
 export async function getPostsByUserId(userId) {
   const { rows: posts } = await connection.query(
     `
