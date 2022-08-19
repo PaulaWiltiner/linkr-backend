@@ -138,3 +138,34 @@ export async function deleteLike(postId, userId) {
     [postId, userId]
   );
 }
+
+export async function reePost(postId, userId) {
+  await connection.query(
+    `
+    INSERT INTO "reposts" ("postId", "userId") 
+    VALUES($1, $2);`,
+    [postId, userId]
+  );
+}
+
+export async function findRePost(postId, userId) {
+  const {
+    rows: [post],
+  } = await connection.query(
+    `
+    SELECT * FROM "reposts" WHERE  "postId"=$1 AND "userId"=$2;`,
+    [postId, userId]
+  );
+  return post;
+}
+
+export async function belongPost(postId, userId) {
+  const {
+    rows: [post],
+  } = await connection.query(
+    `
+    SELECT * FROM "userPosts" WHERE  "postId"=$1 AND "userId"=$2;`,
+    [postId, userId]
+  );
+  return post;
+}

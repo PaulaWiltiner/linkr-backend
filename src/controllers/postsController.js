@@ -6,6 +6,7 @@ import {
   getPosts,
   getPostsByUserId,
   getPostsWithoutLimit,
+  reePost,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
 
@@ -174,4 +175,15 @@ export async function reloadPosts(req, res) {
   const posts = await getPostsWithoutLimit(userId);
 
   return res.status(200).send(posts);
+}
+
+export async function rePost(req, res) {
+  const { userId } = res.locals;
+  const { postId } = req.params;
+  try {
+    await reePost(postId, userId);
+    return res.sendStatus(201);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 }

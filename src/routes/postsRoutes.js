@@ -6,6 +6,7 @@ import {
   postsByUserId,
   pullPosts,
   reloadPosts,
+  rePost,
   unlikePost,
   updatePost,
 } from "../controllers/postsController.js";
@@ -22,6 +23,7 @@ import {
   validateFollowers,
   validatePostsFollowers,
 } from "../middlewares/validateFollowers.js";
+import { validateRePost } from "../middlewares/validateRePost.js";
 
 export const postsRouter = Router();
 postsRouter.post(
@@ -66,3 +68,10 @@ postsRouter.delete(
   unlikePost
 );
 postsRouter.get("/posts/reload", authenticateToken, reloadPosts);
+
+postsRouter.post(
+  "/post/repost/:postId",
+  authenticateToken,
+  validateRePost,
+  rePost
+);
