@@ -3,8 +3,8 @@ import { connection } from "../dbStrategy/postgres.js";
 export async function getPosts(userId) {
   const { rows: posts } = await connection.query(
     `
-    SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
-     posts.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
+    SELECT  post.id, json_build_object('description',post."descriptionurl",'title',post."titleurl",'url',post."link", 'image',post."imageurl") AS link,
+     post.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
                        (SELECT json_build_object('count',COUNT("pL".id) ,
 												 'usernameList' , (array_agg(users.username))[1:3] ,
 												 'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
@@ -12,14 +12,14 @@ export async function getPosts(userId) {
 						(SELECT * 
 						FROM "postLikes"  
 						ORDER BY "createdAt" DESC) AS "pL"
-     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRepost"
-     FROM posts
-     JOIN "userPosts" ON "userPosts"."postId"=posts.id
-	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
+     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= post.id) AS "postLikes", post."isRepost"
+     FROM (SELECT posts.* , (SELECT reposts."userId" FROM reposts WHERE reposts.id=posts."isRepost" ) AS "userIdRepost" FROM posts ) AS post
+     JOIN "userPosts" ON "userPosts"."postId"=post.id
+     JOIN  "userFollowers" ON "userFollowers".follower=$1
      JOIN users ON "userFollowers".followed=users.id 
-	   WHERE "userFollowers".follower=$1 OR users.id=$1
-	   GROUP BY posts.id,users.id 
-     ORDER BY posts.id DESC LIMIT 10;
+     WHERE "userPosts"."userId"=users.id OR users.id=$1 OR post."userIdRepost"="userFollowers".followed
+     GROUP BY post.id,users.id ,post."descriptionurl", post."titleurl", post."link", post."imageurl", post.description,post."isRepost"
+     ORDER BY post.id DESC LIMIT 10;
   `,
     [userId]
   );
