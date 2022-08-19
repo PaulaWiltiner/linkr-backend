@@ -4,22 +4,22 @@ export async function getPosts(userId, startLimit) {
   const { rows: posts } = await connection.query(
     `
     SELECT  post.id, json_build_object('description',post."descriptionurl",'title',post."titleurl",'url',post."link", 'image',post."imageurl") AS link,
-     post.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
-                       (SELECT json_build_object('count',COUNT("pL".id) ,
-                                                 'usernameList' , (array_agg(users.username))[1:3] ,
-                                                 'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
-                        FROM 
-                        (SELECT * 
-                        FROM "postLikes"
-                        ORDER BY "createdAt" DESC) AS "pL"
-     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= post.id) AS "postLikes", post."isRepost"
-     FROM (SELECT posts.* , (SELECT reposts."userId" FROM reposts WHERE reposts.id=posts."isRepost" ) AS "userIdRepost" FROM posts ) AS post
-     JOIN "userPosts" ON "userPosts"."postId"=post.id AND post.id < $2
-     JOIN  "userFollowers" ON "userFollowers".follower=$1
-     JOIN users ON "userFollowers".followed=users.id 
-     WHERE "userPosts"."userId"=users.id OR users.id=$1 OR post."userIdRepost"="userFollowers".followed
-     GROUP BY post.id,users.id ,post."descriptionurl", post."titleurl", post."link", post."imageurl", post.description,post."isRepost"
-     ORDER BY post.id DESC LIMIT 10;
+    post.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
+                      (SELECT json_build_object('count',COUNT("pL".id) ,
+                        'usernameList' , (array_agg(users.username))[1:3] ,
+                        'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
+                       FROM 
+           (SELECT * 
+           FROM "postLikes"  
+           ORDER BY "createdAt" DESC) AS "pL"
+    JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= post.id) AS "postLikes", post."isRepost"
+    FROM (SELECT posts.* , (SELECT reposts."userId" FROM reposts WHERE reposts.id=posts."isRepost" ) AS "userIdRepost" FROM posts ) AS post
+    JOIN "userPosts" ON "userPosts"."postId"=post.id AND post.id < $2
+    JOIN  "userFollowers" ON "userFollowers".follower=$1
+    JOIN users ON "userFollowers".followed=users.id OR users.id=$1
+    WHERE "userPosts"."userId"=users.id OR post."userIdRepost"="userFollowers".followed
+    GROUP BY post.id,users.id ,post."descriptionurl", post."titleurl", post."link", post."imageurl", post.description,post."isRepost"
+    ORDER BY post.id DESC LIMIT 10;
   `,
     [userId, startLimit]
   );
@@ -45,7 +45,7 @@ export async function getPostsByUserId(userId) {
      WHERE users.id = $2
      ORDER BY posts.id DESC LIMIT 10;
   `,
-    [userId, userId]
+    [userId]
   );
 
   return posts;
@@ -53,23 +53,23 @@ export async function getPostsByUserId(userId) {
 export async function getPostsWithoutLimit(userId) {
   const { rows: posts } = await connection.query(
     `
-    SELECT  post.id, json_build_object('description',post."descriptionurl",'title',post."titleurl",'url',post."link", 'image',post."imageurl") AS link,
-     post.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
-                       (SELECT json_build_object('count',COUNT("pL".id) ,
-                                                 'usernameList' , (array_agg(users.username))[1:3] ,
-                                                 'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
-                        FROM 
-                        (SELECT * 
-                        FROM "postLikes"
-                        ORDER BY "createdAt" DESC) AS "pL"
-     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= post.id) AS "postLikes", post."isRepost"
-     FROM (SELECT posts.* , (SELECT reposts."userId" FROM reposts WHERE reposts.id=posts."isRepost" ) AS "userIdRepost" FROM posts ) AS post
-     JOIN "userPosts" ON "userPosts"."postId"=post.id
-     JOIN  "userFollowers" ON "userFollowers".follower=$1
-     JOIN users ON "userFollowers".followed=users.id 
-     WHERE "userPosts"."userId"=users.id OR users.id=$1 OR post."userIdRepost"="userFollowers".followed
-     GROUP BY post.id,users.id ,post."descriptionurl", post."titleurl", post."link", post."imageurl", post.description,post."isRepost"
-     ORDER BY post.id DESC;
+   SELECT  post.id, json_build_object('description',post."descriptionurl",'title',post."titleurl",'url',post."link", 'image',post."imageurl") AS link,
+    post.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
+                      (SELECT json_build_object('count',COUNT("pL".id) ,
+                        'usernameList' , (array_agg(users.username))[1:3] ,
+                        'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
+                       FROM 
+           (SELECT * 
+           FROM "postLikes"  
+           ORDER BY "createdAt" DESC) AS "pL"
+    JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= post.id) AS "postLikes", post."isRepost"
+    FROM (SELECT posts.* , (SELECT reposts."userId" FROM reposts WHERE reposts.id=posts."isRepost" ) AS "userIdRepost" FROM posts ) AS post
+    JOIN "userPosts" ON "userPosts"."postId"=post.id
+    JOIN  "userFollowers" ON "userFollowers".follower=$1
+    JOIN users ON "userFollowers".followed=users.id OR users.id=$1
+    WHERE "userPosts"."userId"=users.id OR post."userIdRepost"="userFollowers".followed
+    GROUP BY post.id,users.id ,post."descriptionurl", post."titleurl", post."link", post."imageurl", post.description,post."isRepost"
+    ORDER BY post.id DESC;
   `,
     [userId]
   );
@@ -196,6 +196,21 @@ export async function getRePost(postId) {
   return reposts;
 }
 
+export async function getLikesPost(postId, userId) {
+  const {
+    rows: [likes],
+  } = await connection.query(
+    `
+    SELECT json_build_object('count',COUNT( "pL".id) ,'usernameList' , (array_agg(users.username))[1:3] , 'isLiked' , (json_agg(COALESCE(( "pL"."userId" =$2), 'false')) FILTER (WHERE COALESCE(( "pL"."userId" =$2 ) ,'false'))) ) AS "postLikes"
+    FROM (SELECT * FROM "postLikes" ORDER BY "createdAt" DESC) AS "pL"
+    JOIN users ON  "pL"."userId"=users.id 
+    WHERE "pL"."postId"= $1
+    `,
+    [postId, userId]
+  );
+  return likes;
+}
+
 export async function belongPost(postId, userId) {
   const {
     rows: [post],
@@ -276,3 +291,4 @@ export async function getHashtag() {
     `SELECT hashtag FROM trending`
   );
 } 
+

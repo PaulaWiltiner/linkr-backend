@@ -12,6 +12,7 @@ import {
   getComments,
   createComment,
   reePosts,
+  likesPost,
 } from "../controllers/postsController.js";
 import { validatePostComments } from "../middlewares/validatePostComments.js";
 import { validateCreatePost } from "../middlewares/validateCreatePost.js";
@@ -95,3 +96,5 @@ postsRouter.post(
   validateCreateComment,
   createComment
 );
+
+postsRouter.get("/likes/:postId", authenticateToken, likesPost);

@@ -4,6 +4,7 @@ import {
   createLike,
   deleteLike,
   deletePostById,
+  getLikesPost,
   getIdForEmail,
   getPosts,
   getPostsByUserId,
@@ -244,4 +245,13 @@ export async function createComment(req, res) {
   setComment(comment, userId, postId);
 
   return res.sendStatus(200);
+}
+
+export async function likesPost(req, res) {
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+  const response = await getLikesPost(postId, userId);
+
+  return res.send(response).status(200);
 }
