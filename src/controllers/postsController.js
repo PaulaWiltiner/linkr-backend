@@ -92,9 +92,16 @@ export async function createPost(req, res) {
 
 export async function pullPosts(req, res) {
   const { userId } = res.locals;
+  const { start } = req.query;
   try {
+    let startLimit = start;
     const allposts = await getPostsWithoutLimit(userId);
-    const postList = await getPosts(res.locals.userId);
+
+    if (!start) {
+      startLimit = (allposts[0].id)+1;
+    }
+
+    const postList = await getPosts(res.locals.userId, startLimit);
     return res
       .send({
         errFollower: res.locals.validateErrFollower,
@@ -103,6 +110,7 @@ export async function pullPosts(req, res) {
       })
       .status(200);
   } catch (error) {
+    console.log(error)
     return res.sendStatus(500);
   }
 }

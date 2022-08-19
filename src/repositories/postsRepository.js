@@ -1,6 +1,6 @@
 import { connection } from "../dbStrategy/postgres.js";
 
-export async function getPosts(userId, start) {
+export async function getPosts(userId, startLimit) {
   const { rows: posts } = await connection.query(
     `
     SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
@@ -14,14 +14,14 @@ export async function getPosts(userId, start) {
 						ORDER BY "createdAt" DESC) AS "pL"
      JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRepost"
      FROM posts
-     JOIN "userPosts" ON "userPosts"."postId"=posts.id
+     JOIN "userPosts" ON "userPosts"."postId"=posts.id AND posts.id < $2
 	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
      JOIN users ON "userFollowers".followed=users.id 
 	   WHERE "userFollowers".follower=$1 OR users.id=$1
 	   GROUP BY posts.id,users.id 
      ORDER BY posts.id DESC LIMIT 10;
   `,
-    [userId]
+    [userId, startLimit]
   );
   return posts;
 }
@@ -62,12 +62,13 @@ export async function getPostsWithoutLimit(userId) {
 						(SELECT * 
 						FROM "postLikes"  
 						ORDER BY "createdAt" DESC) AS "pL"
-     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes"
+     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRepost"
      FROM posts
      JOIN "userPosts" ON "userPosts"."postId"=posts.id
 	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
-     JOIN users ON "userFollowers".followed=users.id
-	   WHERE "userFollowers".follower=$1
+     JOIN users ON "userFollowers".followed=users.id 
+	   WHERE "userFollowers".follower=$1 OR users.id=$1
+	   GROUP BY posts.id,users.id 
      ORDER BY posts.id DESC;
   `,
     [userId]
