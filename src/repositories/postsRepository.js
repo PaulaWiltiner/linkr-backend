@@ -139,12 +139,29 @@ export async function deleteLike(postId, userId) {
   );
 }
 
-export async function reePost(postId, userId) {
-  await connection.query(
+export async function reePost(postId, userId, post) {
+  const {
+    rows: [repostId],
+  } = await connection.query(
     `
     INSERT INTO "reposts" ("postId", "userId") 
-    VALUES($1, $2);`,
+    VALUES($1, $2)  RETURNING id;`,
     [postId, userId]
+  );
+  console.log(post);
+  const {
+    rows: [newPostId],
+  } = await connection.query(
+    `
+    INSERT INTO "posts" ("description", "link", "titleurl", "descriptionurl", "imageurl","isRepost") 
+    VALUES('${post.description}','${post.link}','${post.titleurl}','${post.descriptionurl}','${post.imageurl}',$1) RETURNING id;`,
+    [repostId.id]
+  );
+  await connection.query(
+    `
+    INSERT INTO "userPosts" ("postId", "userId")
+    VALUES($1,$2) RETURNING id;`,
+    [newPostId.id, userId]
   );
 }
 
@@ -157,6 +174,16 @@ export async function findRePost(postId, userId) {
     [postId, userId]
   );
   return post;
+}
+export async function getRePost(postId) {
+  const {
+    rows: [reposts],
+  } = await connection.query(
+    `
+    SELECT COUNT("reposts".id) FROM reposts WHERE reposts."postId"=$1 `,
+    [postId]
+  );
+  return reposts.count;
 }
 
 export async function belongPost(postId, userId) {

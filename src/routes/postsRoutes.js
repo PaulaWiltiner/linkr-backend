@@ -11,6 +11,7 @@ import {
   updatePost,
   getComments,
   createComment,
+  reePosts,
 } from "../controllers/postsController.js";
 import { validatePostComments } from "../middlewares/validatePostComments.js";
 import { validateCreatePost } from "../middlewares/validateCreatePost.js";
@@ -77,8 +78,11 @@ postsRouter.post(
   "/post/repost/:postId",
   authenticateToken,
   validateRePost,
-  rePost);
-  
+  rePost
+);
+
+postsRouter.get("/post/repost/:postId", reePosts);
+
 postsRouter.get(
   "/posts/:postId/comments",
   authenticateToken,
