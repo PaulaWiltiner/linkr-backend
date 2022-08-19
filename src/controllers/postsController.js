@@ -3,6 +3,7 @@ import {
   createLike,
   deleteLike,
   deletePostById,
+  getLikesPost,
   getPosts,
   getPostsByUserId,
   getPostsWithoutLimit,
@@ -232,4 +233,13 @@ export async function createComment(req, res) {
   );
 
   return res.sendStatus(200);
+}
+
+export async function likesPost(req, res) {
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+  const response = await getLikesPost(postId, userId);
+
+  return res.send(response).status(200);
 }
