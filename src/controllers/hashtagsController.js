@@ -5,10 +5,9 @@ import {
 
 export async function oneHashtag(req, res) {
   const { hashtag } = req.params;
-  const { rows: hashtagList } = await getOneHashtag(
-    res.locals.userId,
-    "#" + hashtag
-  );
+  const {
+    rows: [hashtagList],
+  } = await getOneHashtag(res.locals.userId, "#" + hashtag);
 
   if (!hashtagList) {
     return res.sendStatus(404);
