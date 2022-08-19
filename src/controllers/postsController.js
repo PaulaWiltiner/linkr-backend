@@ -18,7 +18,7 @@ import {
   updateDescription,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
-
+import { getQtdComments } from "../repositories/postsRepository.js";
 export async function createPost(req, res) {
   const post = req.body;
   const email = req.email;
@@ -34,8 +34,8 @@ export async function createPost(req, res) {
       (hashtag) => hashtag[0] === "#"
     );
 
-    const { rows: dbHashtags } =getHashtag();
-    
+    const { rows: dbHashtags } = getHashtag();
+
     const alreadyExistHashtags = dbHashtags.map((user) => user.hashtag);
 
     const hashtagsToInsert = userHashtags.filter((userHashtag) => {
@@ -51,11 +51,17 @@ export async function createPost(req, res) {
         return userHashtag;
       }
     });
-    post.description, post.link, titleURL, descriptionURL, imageURL
+    post.description, post.link, titleURL, descriptionURL, imageURL;
     const { rows: user } = getIdForEmail(email);
     const {
       rows: [postId],
-    } = addPosts(post.description, post.link, titleURL, descriptionURL, imageURL);
+    } = addPosts(
+      post.description,
+      post.link,
+      titleURL,
+      descriptionURL,
+      imageURL
+    );
 
     hashtagsToInsert.map(async (hashtag) => {
       insertTrending(hashtag);
@@ -70,7 +76,6 @@ export async function createPost(req, res) {
     }
 
     arrayHashtagsId.map(async (id) => {
-
       insertHashtags(postId.id, id);
     });
 
@@ -91,7 +96,7 @@ export async function pullPosts(req, res) {
       .send({
         errFollower: res.locals.validateErrFollower,
         postList: postList,
-        length: allposts.length
+        length: allposts.length,
       })
       .status(200);
   } catch (error) {
@@ -104,9 +109,8 @@ export async function updatePost(req, res) {
   const { id } = req.params;
 
   try {
-
     updateDescription(id, description);
-    
+
     return res.status(200).send("successfully updated");
   } catch (error) {
     return res.sendStatus(500);
