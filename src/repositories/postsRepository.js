@@ -3,25 +3,23 @@ import { connection } from "../dbStrategy/postgres.js";
 export async function getPosts(userId, startLimit) {
   const { rows: posts } = await connection.query(
     `
-    SELECT  pt.id, json_build_object('description',pt."descriptionurl",'title',pt."titleurl",'url',pt."link", 'image',pt."imageurl") AS link,
-     pt.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
+    SELECT  post.id, json_build_object('description',post."descriptionurl",'title',post."titleurl",'url',post."link", 'image',post."imageurl") AS link,
+     post.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
                        (SELECT json_build_object('count',COUNT("pL".id) ,
-											 'usernameList' , (array_agg(users.username))[1:3] ,
-												 'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
+                                                 'usernameList' , (array_agg(users.username))[1:3] ,
+                                                 'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
                         FROM 
-						(SELECT * 
- 						FROM "postLikes"  
-						ORDER BY "createdAt" DESC) AS "pL"
-    JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= pt.id) AS "postLikes", pt."isRepost"
-    FROM (SELECT "userFollowers".followed FROM "userFollowers"
-    WHERE "userFollowers".follower=$1) AS uf
-    JOIN "userPosts" ON "userPosts"."userId"=$1 OR "userPosts"."userId"=uf.followed
-    JOIN users ON "userPosts"."userId"=users.id
-    JOIN (SELECT posts.* , (SELECT reposts."userId" FROM reposts WHERE reposts.id=posts."isRepost" ) AS "userIdRepost" FROM posts ) AS pt ON pt.id="userPosts"."postId" 
-    OR pt."isRepost"=uf.followed 
-    WHERE pt.id < $2
-    GROUP BY pt.id,users.id , pt."descriptionurl", pt."titleurl", pt."link", pt."imageurl", pt.description,pt."isRepost"
-    ORDER BY pt.id DESC LIMIT 10;
+                        (SELECT * 
+                        FROM "postLikes"
+                        ORDER BY "createdAt" DESC) AS "pL"
+     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= post.id) AS "postLikes", post."isRepost"
+     FROM (SELECT posts.* , (SELECT reposts."userId" FROM reposts WHERE reposts.id=posts."isRepost" ) AS "userIdRepost" FROM posts ) AS post
+     JOIN "userPosts" ON "userPosts"."postId"=post.id AND post.id < $2
+     JOIN  "userFollowers" ON "userFollowers".follower=$1
+     JOIN users ON "userFollowers".followed=users.id 
+     WHERE "userPosts"."userId"=users.id OR users.id=$1 OR post."userIdRepost"="userFollowers".followed
+     GROUP BY post.id,users.id ,post."descriptionurl", post."titleurl", post."link", post."imageurl", post.description,post."isRepost"
+     ORDER BY post.id DESC LIMIT 10;
   `,
     [userId, startLimit]
   );
