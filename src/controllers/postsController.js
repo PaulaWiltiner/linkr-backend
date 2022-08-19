@@ -159,7 +159,6 @@ export async function postsByUserId(req, res) {
 
     if (!user) return res.sendStatus(404);
 
- 
     const userPosts = await getPostsByUserId(user.id);
 
     return res.status(200).send(userPosts);
@@ -177,7 +176,6 @@ export async function reloadPosts(req, res) {
   return res.status(200).send(posts);
 }
 
-
 export async function rePost(req, res) {
   const { userId } = res.locals;
   const { postId } = req.params;
@@ -187,7 +185,8 @@ export async function rePost(req, res) {
   } catch (error) {
     return res.sendStatus(500);
   }
-  
+}
+
 export async function getComments(req, res) {
   const { postId } = req.params;
   const { username } = res.locals.userId;
@@ -208,6 +207,7 @@ export async function getComments(req, res) {
     qtdOfComments: comments,
   });
 }
+
 export async function createComment(req, res) {
   const { comment } = req.body;
   const { postId } = req.params;
@@ -219,5 +219,4 @@ export async function createComment(req, res) {
   );
 
   return res.sendStatus(200);
-
 }
