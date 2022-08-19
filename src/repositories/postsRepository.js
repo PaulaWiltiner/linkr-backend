@@ -26,28 +26,38 @@ export async function getPosts(userId, startLimit) {
   return posts;
 }
 
-export async function getPostsByUserId(userId) {
-  const { rows: posts } = await connection.query(
-    `
+export async function getPostsByUserId(userId, startLimit) {
+  const bindParam = startLimit ? 'AND posts.id < $2' : '';
+  const defaultQuery = `
     SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
-     posts.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
-                       (SELECT json_build_object('count',COUNT("pL".id) ,
-												 'usernameList' , (array_agg(users.username))[1:3] ,
-												 'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
+    posts.description, json_build_object('id',users.id ,'username',users.username, 'picture',users.picture) AS user,
+                      (SELECT json_build_object('count',COUNT("pL".id) ,
+                        'usernameList' , (array_agg(users.username))[1:3] ,
+                        'isLiked' , (json_agg(COALESCE(("pL"."userId" = $1), 'false')) FILTER (WHERE COALESCE(("pL"."userId" = $1), 'false'))) )
                         FROM 
-						(SELECT * 
-						FROM "postLikes"  
-						ORDER BY "createdAt" DESC) AS "pL"
-     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRepost"
-     FROM posts
-     JOIN "userPosts" ON "userPosts"."postId"=posts.id
-     JOIN users ON "userPosts"."userId"=users.id
-     WHERE users.id = $2
-     ORDER BY posts.id DESC LIMIT 10;
-  `,
+            (SELECT * 
+            FROM "postLikes"  
+            ORDER BY "createdAt" DESC) AS "pL"
+    JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRepost"
+    FROM posts
+    JOIN "userPosts" ON "userPosts"."postId"=posts.id ${bindParam}
+    JOIN users ON "userPosts"."userId"=users.id
+    WHERE users.id = $1
+    ORDER BY posts.id DESC
+  `;
+  if (startLimit) {
+    const query = defaultQuery+'LIMIT 10;';
+    const { rows: posts } = await connection.query(
+      query,
+      [userId, startLimit]
+    );
+    return posts;
+  }
+  const query = defaultQuery+';';
+  const { rows: posts } = await connection.query(
+    query,
     [userId]
   );
-
   return posts;
 }
 export async function getPostsWithoutLimit(userId) {

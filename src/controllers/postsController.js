@@ -1,4 +1,3 @@
-import { connection } from "../dbStrategy/postgres.js";
 import {
   addPosts,
   createLike,
@@ -171,6 +170,7 @@ export async function unlikePost(req, res) {
 
 export async function postsByUserId(req, res) {
   const { id } = req.params;
+  const { start } = req.query;
 
   try {
     const {
@@ -179,9 +179,35 @@ export async function postsByUserId(req, res) {
 
     if (!user) return res.sendStatus(404);
 
-    const userPosts = await getPostsByUserId(user.id);
+    let startLimit = start;
+    const allposts = await getPostsByUserId(user.id);
+    if (!allposts.length) {
+      //errFollower: res.locals.validateErrFollower,
+      return res
+        .send({
+          postList: [],
+          length: 0,
+        })
+        .status(200);
+    }
 
-    return res.status(200).send(userPosts);
+    if (!start) {
+      startLimit = allposts[0].id + 1;
+    }
+
+    const userPosts = await getPostsByUserId(user.id, startLimit);
+
+    //errFollower: res.locals.validateErrFollower,
+    return res
+      .send({
+        userInfo: {
+          username: user.username,
+          picture: user.picture,
+        },
+        postList: userPosts,
+        length: allposts.length,
+      })
+      .status(200);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
