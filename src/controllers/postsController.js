@@ -6,6 +6,8 @@ import {
   getPosts,
   getPostsByUserId,
   getPostsWithoutLimit,
+  getRePost,
+  reePost,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
 
@@ -89,28 +91,19 @@ export async function createPost(req, res) {
 }
 
 export async function pullPosts(req, res) {
-  const { page } = req.query;
   const { userId } = res.locals;
-  console.log(page);
   try {
-    if ((page && page < 1) || !page) {
-      console.log('Número da página inválido!');
-      return res.sendStatus(400);
-    }
-
-    const limit = 10;
-    const start = (page - 1) * limit;
-    
-    const postList = await getPosts(userId, start);
     const allposts = await getPostsWithoutLimit(userId);
-    res.status(200).send([...postList, {length: allposts.length}]);
-  } catch (error) {
-    console.log(error);
+    const postList = await getPosts(res.locals.userId);
     return res
-      .status(500)
-      .send(
-        "An error occured while trying to fetch the posts, please refresh the page"
-      );
+      .send({
+        errFollower: res.locals.validateErrFollower,
+        postList: postList,
+        length: allposts.length
+      })
+      .status(200);
+  } catch (error) {
+    return res.sendStatus(500);
   }
 }
 
@@ -169,9 +162,8 @@ export async function postsByUserId(req, res) {
 
     if (!user) return res.sendStatus(404);
 
-    console.log(user);
     const userPosts = await getPostsByUserId(user.id);
-    console.log(userPosts);
+
     return res.status(200).send(userPosts);
   } catch (error) {
     console.log(error);
@@ -185,4 +177,61 @@ export async function reloadPosts(req, res) {
   const posts = await getPostsWithoutLimit(userId);
 
   return res.status(200).send(posts);
+}
+
+export async function rePost(req, res) {
+  const { userId } = res.locals;
+  const { postId } = req.params;
+  try {
+    await reePost(postId, userId, res.locals.post);
+    return res.sendStatus(201);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function reePosts(req, res) {
+  const { postId } = req.params;
+  try {
+    const response = await getRePost(postId);
+    return res.status(200).send(response);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function getComments(req, res) {
+  const { postId } = req.params;
+  const postAuthor = res.locals.userId;
+
+  const {
+    rows: [qtdComments],
+  } = await connection.query(
+    `SELECT COUNT("postId") as qtd FROM "postComments" WHERE "postId" = $1 GROUP BY "postId"`,
+    [postId]
+  );
+
+  const comments = qtdComments ? qtdComments.qtd : 0;
+
+  return res.status(200).send({
+    postAuthor,
+    postId: postId,
+    comments: res.locals.comments,
+    qtdOfComments: comments,
+  });
+}
+
+export async function createComment(req, res) {
+  const { comment } = req.body;
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+  await connection.query(
+    `INSERT INTO "postComments" (comment, "userId", "postId") VALUES ($1, $2, $3)`,
+    [comment, userId, postId]
+  );
+
+  return res.sendStatus(200);
 }

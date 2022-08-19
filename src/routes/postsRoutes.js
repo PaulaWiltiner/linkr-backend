@@ -6,9 +6,14 @@ import {
   postsByUserId,
   pullPosts,
   reloadPosts,
+  rePost,
   unlikePost,
   updatePost,
+  getComments,
+  createComment,
+  reePosts,
 } from "../controllers/postsController.js";
+import { validatePostComments } from "../middlewares/validatePostComments.js";
 import { validateCreatePost } from "../middlewares/validateCreatePost.js";
 import { validateAlterationPost } from "../middlewares/validateAlterationPost.js";
 import authenticateToken from "../middlewares/authenticateToken.js";
@@ -18,7 +23,12 @@ import {
   likeMiddleware,
   unlikeMiddleware,
 } from "../middlewares/likeMiddleware.js";
-import { validateFollowers } from "../middlewares/validateFollowers.js";
+import {
+  validateFollowers,
+  validatePostsFollowers,
+} from "../middlewares/validateFollowers.js";
+import { validateRePost } from "../middlewares/validateRePost.js";
+import { validateCreateComment } from "../middlewares/validateCreateComment.js";
 
 export const postsRouter = Router();
 postsRouter.post(
@@ -28,7 +38,13 @@ postsRouter.post(
   validateUrl,
   createPost
 );
-postsRouter.get("/posts", authenticateToken, validateFollowers, pullPosts);
+postsRouter.get(
+  "/posts",
+  authenticateToken,
+  validateFollowers,
+  validatePostsFollowers,
+  pullPosts
+);
 postsRouter.get("/user/:id", postsByUserId);
 
 postsRouter.put(
@@ -57,3 +73,25 @@ postsRouter.delete(
   unlikePost
 );
 postsRouter.get("/posts/reload", authenticateToken, reloadPosts);
+
+postsRouter.post(
+  "/post/repost/:postId",
+  authenticateToken,
+  validateRePost,
+  rePost
+);
+
+postsRouter.get("/post/repost/:postId", reePosts);
+
+postsRouter.get(
+  "/posts/:postId/comments",
+  authenticateToken,
+  validatePostComments,
+  getComments
+);
+postsRouter.post(
+  "/posts/:postId/comments",
+  authenticateToken,
+  validateCreateComment,
+  createComment
+);
