@@ -159,9 +159,9 @@ export async function postsByUserId(req, res) {
 
     if (!user) return res.sendStatus(404);
 
-    console.log(user);
+ 
     const userPosts = await getPostsByUserId(user.id);
-    console.log(userPosts);
+
     return res.status(200).send(userPosts);
   } catch (error) {
     console.log(error);
@@ -177,6 +177,7 @@ export async function reloadPosts(req, res) {
   return res.status(200).send(posts);
 }
 
+
 export async function rePost(req, res) {
   const { userId } = res.locals;
   const { postId } = req.params;
@@ -186,4 +187,37 @@ export async function rePost(req, res) {
   } catch (error) {
     return res.sendStatus(500);
   }
+  
+export async function getComments(req, res) {
+  const { postId } = req.params;
+  const { username } = res.locals.userId;
+
+  const {
+    rows: [qtdComments],
+  } = await connection.query(
+    `SELECT COUNT("postId") as qtd FROM "postComments" WHERE "postId" = $1 GROUP BY "postId"`,
+    [postId]
+  );
+
+  const comments = qtdComments ? qtdComments.qtd : 0;
+
+  return res.status(200).send({
+    postAuthor: username,
+    postId: postId,
+    comments: res.locals.comments,
+    qtdOfComments: comments,
+  });
+}
+export async function createComment(req, res) {
+  const { comment } = req.body;
+  const { postId } = req.params;
+  const userId = res.locals.userId;
+
+  await connection.query(
+    `INSERT INTO "postComments" (comment, "userId", "postId") VALUES ($1, $2, $3)`,
+    [comment, userId, postId]
+  );
+
+  return res.sendStatus(200);
+
 }
