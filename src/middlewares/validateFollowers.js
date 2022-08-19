@@ -7,9 +7,11 @@ export async function validateFollowers(req, res, next) {
   try {
     const result = await getOneFollower(res.locals.userId);
     res.locals.validateErrFollower = "";
+    res.locals.status = true;
     if (result.length === 0) {
       res.locals.validateErrFollower =
         "You don't follow anyone yet. Search for new friends!";
+      res.locals.status = false;
     }
   } catch (err) {
     return res.status(500);
