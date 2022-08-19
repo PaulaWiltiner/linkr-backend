@@ -23,7 +23,6 @@ export async function getPosts(userId) {
   `,
     [userId]
   );
-
   return posts;
 }
 
