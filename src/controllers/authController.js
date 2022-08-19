@@ -3,6 +3,7 @@ import {
   createSession,
   getSessionUserId,
   deleteSession,
+  velidateEmail,
 } from "../repositories/authRepository.js";
 import jwt from "jsonwebtoken";
 
@@ -11,15 +12,10 @@ import { getUserByEmail } from "../repositories/usersRepository.js";
 import dotenv from "dotenv";
 dotenv.config();
 
-import { connection } from "../dbStrategy/postgres.js";
-
 export default async function signUp(req, res) {
   const { username, email, password, picture } = req.body;
 
-  const { rows: isEmail } = await connection.query(
-    `SELECT email FROM users WHERE email = $1`,
-    [email]
-  );
+  const { rows: isEmail } = velidateEmail(email);
 
   if (isEmail.length > 0) {
     res.status(409).send("email is already being used");
@@ -27,10 +23,7 @@ export default async function signUp(req, res) {
   }
 
   const hashPassword = bcrypt.hashSync(password, 10);
-  await connection.query(
-    "INSERT INTO users (picture, username, email, password) VALUES ($1, $2, $3, $4)",
-    [picture, username, email, hashPassword]
-  );
+  await createUser(picture, username, email, hashPassword);
 
   res.sendStatus(201);
 }

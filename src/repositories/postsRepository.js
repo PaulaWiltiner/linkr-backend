@@ -194,3 +194,84 @@ export async function getRePost(postId) {
   );
   return reposts;
 }
+
+export async function belongPost(postId, userId) {
+  const {
+    rows: [post],
+  } = await connection.query(
+    `
+    SELECT * FROM "userPosts" WHERE  "postId"=$1 AND "userId"=$2;`,
+    [postId, userId]
+  );
+  return post;
+}
+
+export async function getQtdComments(postId) {
+
+  return await connection.query(
+    `SELECT COUNT("postId") as qtd FROM "postComments" WHERE "postId" = $1 GROUP BY "postId"`,
+    [postId]
+  );
+}
+
+export async function setComment(comment, userId, postId) {
+  return await connection.query(
+    `INSERT INTO "postComments" (comment, "userId", "postId") VALUES ($1, $2, $3)`,
+    [comment, userId, postId]
+  );
+}
+
+export async function updateDescription(id, description) {
+  return await connection.query(`UPDATE posts SET description = $2 WHERE id = $1`, [
+    id,
+    description,
+  ]);
+}
+
+export async function insertPost(postId, userId) {
+  return await connection.query(
+    `INSERT INTO "userPosts" ("postId", "userId") VALUES ($1, $2)`,
+    [postId, userId]
+  );
+}
+
+export async function insertHashtags(postId, id) {
+  return await connection.query(
+    `INSERT INTO "postHashtags" ("postId", "hashtagId") VALUES ($1, $2)`,
+    [postId, id]
+  );
+}
+
+export async function searchIdTrending(userHashtags) {
+
+  return await connection.query(`SELECT id FROM trending WHERE hashtag = $1`, [
+    userHashtags[i],
+  ]);
+}
+
+export async function insertTrending(hashtag) {
+  return await connection.query(`INSERT INTO trending (hashtag) VALUES ($1)`, [
+    hashtag,
+  ]);
+}
+
+export async function addPosts(description, link, titleURL, descriptionURL, imageURL) {
+  return await connection.query(
+    `INSERT INTO posts (description, link, titleURL, descriptionURL , imageURL) VALUES ($1, $2, $3,$4,$5) RETURNING id`,
+    [description, link, titleURL, descriptionURL, imageURL]
+  );
+}
+
+export async function getIdForEmail(email) {
+
+  return await connection.query(
+    `SELECT id FROM users WHERE email = $1;`,
+    [email]
+  )
+}
+
+export async function getHashtag() {
+  return await connection.query(
+    `SELECT hashtag FROM trending`
+  );
+} 
