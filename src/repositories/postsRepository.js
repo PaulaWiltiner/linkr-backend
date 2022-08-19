@@ -69,7 +69,7 @@ export async function getPostsWithoutLimit(userId) {
      JOIN users ON "userFollowers".followed=users.id 
      WHERE "userPosts"."userId"=users.id OR users.id=$1 OR post."userIdRepost"="userFollowers".followed
      GROUP BY post.id,users.id ,post."descriptionurl", post."titleurl", post."link", post."imageurl", post.description,post."isRepost"
-     ORDER BY post.id DESC LIMIT 10;
+     ORDER BY post.id DESC;
   `,
     [userId]
   );
