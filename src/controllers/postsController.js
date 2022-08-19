@@ -181,7 +181,13 @@ export async function postsByUserId(req, res) {
 
     const userPosts = await getPostsByUserId(user.id);
 
-    return res.status(200).send(userPosts);
+    return res.status(200).send({
+      userInfo: {
+        username: user.username,
+        picture: user.picture,
+      },
+      postList: userPosts,
+    });
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
