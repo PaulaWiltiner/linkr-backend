@@ -1,6 +1,6 @@
 import { connection } from "../dbStrategy/postgres.js";
 
-export async function getPosts(userId) {
+export async function getPosts(userId, start) {
   const { rows: posts } = await connection.query(
     `
     SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
@@ -19,13 +19,12 @@ export async function getPosts(userId) {
      JOIN users ON "userFollowers".followed=users.id
 	   WHERE "userFollowers".follower=$1
      ORDER BY posts.id DESC 
-     LIMIT 10;
+     LIMIT 10
+     OFFSET $2;
      `,
-     [userId]
-     );
-     /* 
-     OFFSET $2; */
-    /* [userId, start] */
+     [userId, start]
+    );
+     
   return posts;
 }
 export async function getPostsByUserId(userId) {
