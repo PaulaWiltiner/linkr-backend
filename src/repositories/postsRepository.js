@@ -193,7 +193,7 @@ export async function getRePost(postId) {
     GROUP BY users.username,reposts."postId" `,
     [postId]
   );
-  return reposts.count;
+  return reposts;
 }
 
 export async function belongPost(postId, userId) {
