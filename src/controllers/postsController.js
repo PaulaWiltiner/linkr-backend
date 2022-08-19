@@ -16,6 +16,7 @@ import {
   searchIdTrending,
   setComment,
   updateDescription,
+  getHashtag,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
 import { getQtdComments } from "../repositories/postsRepository.js";
@@ -35,7 +36,7 @@ export async function createPost(req, res) {
       (hashtag) => hashtag[0] === "#"
     );
 
-    const { rows: dbHashtags } = getHashtag();
+    const { rows: dbHashtags } = await getHashtag();
 
     const alreadyExistHashtags = dbHashtags.map((user) => user.hashtag);
 
@@ -53,10 +54,10 @@ export async function createPost(req, res) {
       }
     });
     post.description, post.link, titleURL, descriptionURL, imageURL;
-    const { rows: user } = getIdForEmail(email);
+    const { rows: user } = await getIdForEmail(email);
     const {
       rows: [postId],
-    } = addPosts(
+    } = await addPosts(
       post.description,
       post.link,
       titleURL,
@@ -65,22 +66,22 @@ export async function createPost(req, res) {
     );
 
     hashtagsToInsert.map(async (hashtag) => {
-      insertTrending(hashtag);
+      await insertTrending(hashtag);
     });
 
     for (let i = 0; i < userHashtags.length; i++) {
       const {
         rows: [hashtagId],
-      } = searchIdTrending(userHashtags[i]);
+      } = await searchIdTrending(userHashtags[i]);
 
       arrayHashtagsId.push(hashtagId.id);
     }
 
     arrayHashtagsId.map(async (id) => {
-      insertHashtags(postId.id, id);
+      await insertHashtags(postId.id, id);
     });
 
-    insertPost(postId.id, user[0].id);
+    await insertPost(postId.id, user[0].id);
 
     return res.sendStatus(201);
   } catch (error) {
