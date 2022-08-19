@@ -202,7 +202,7 @@ export async function reePosts(req, res) {
 
 export async function getComments(req, res) {
   const { postId } = req.params;
-  const { username } = res.locals.userId;
+  const postAuthor = res.locals.userId;
 
   const {
     rows: [qtdComments],
@@ -214,7 +214,7 @@ export async function getComments(req, res) {
   const comments = qtdComments ? qtdComments.qtd : 0;
 
   return res.status(200).send({
-    postAuthor: username,
+    postAuthor,
     postId: postId,
     comments: res.locals.comments,
     qtdOfComments: comments,
