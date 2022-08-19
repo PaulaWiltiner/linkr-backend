@@ -187,10 +187,10 @@ export async function getRePost(postId) {
     rows: [reposts],
   } = await connection.query(
     `
-    SELECT COUNT("reposts".id),users.username FROM reposts
+    SELECT COUNT("reposts".id),users.username,reposts."postId" FROM reposts
     JOIN users ON users.id=reposts."userId" AND reposts.id=$1
     WHERE reposts."postId"=(SELECT reposts."postId" FROM reposts WHERE reposts.id=$1)
-    GROUP BY users.username `,
+    GROUP BY users.username,reposts."postId" `,
     [postId]
   );
   return reposts.count;
