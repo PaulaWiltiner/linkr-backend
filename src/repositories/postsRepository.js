@@ -12,7 +12,7 @@ export async function getPosts(userId) {
 						(SELECT * 
 						FROM "postLikes"  
 						ORDER BY "createdAt" DESC) AS "pL"
-     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRePost"
+     JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRepost"
      FROM posts
      JOIN "userPosts" ON "userPosts"."postId"=posts.id
 	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
