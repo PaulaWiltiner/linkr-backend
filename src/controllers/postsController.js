@@ -19,6 +19,7 @@ import {
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
 import { getQtdComments } from "../repositories/postsRepository.js";
+
 export async function createPost(req, res) {
   const post = req.body;
   const email = req.email;
@@ -203,7 +204,7 @@ export async function getComments(req, res) {
 
   const {
     rows: [qtdComments],
-  } = getQtdComments(postId);
+  } = await getQtdComments(postId);
 
   const comments = qtdComments ? qtdComments.qtd : 0;
 
