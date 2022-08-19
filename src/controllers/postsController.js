@@ -197,7 +197,6 @@ export async function postsByUserId(req, res) {
 
     const userPosts = await getPostsByUserId(user.id, startLimit);
 
-    //errFollower: res.locals.validateErrFollower,
     return res
       .send({
         userInfo: {
