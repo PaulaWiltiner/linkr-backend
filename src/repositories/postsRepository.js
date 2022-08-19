@@ -1,6 +1,6 @@
 import { connection } from "../dbStrategy/postgres.js";
 
-export async function getPosts(userId, limitId) {
+export async function getPosts(userId) {
   const { rows: posts } = await connection.query(
     `
     SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
@@ -14,15 +14,14 @@ export async function getPosts(userId, limitId) {
 						ORDER BY "createdAt" DESC) AS "pL"
      JOIN users ON "pL"."userId"=users.id WHERE "pL"."postId"= posts.id) AS "postLikes", posts."isRepost"
      FROM posts
-     JOIN "userPosts" ON "userPosts"."postId"=posts.id AND posts.id < $2
+     JOIN "userPosts" ON "userPosts"."postId"=posts.id
 	   JOIN  "userFollowers" ON "userPosts"."userId"="userFollowers".followed
      JOIN users ON "userFollowers".followed=users.id 
 	   WHERE "userFollowers".follower=$1 OR users.id=$1
 	   GROUP BY posts.id,users.id 
      ORDER BY posts.id DESC LIMIT 10;
-	 
   `,
-    [userId, limitId]
+    [userId]
   );
 
   return posts;
@@ -141,12 +140,10 @@ export async function deleteLike(postId, userId) {
 }
 
 export async function reePost(postId, userId, post) {
-  const {
-    rows: [repostId],
-  } = await connection.query(
+  await connection.query(
     `
     INSERT INTO "reposts" ("postId", "userId") 
-    VALUES($1, $2)  RETURNING id;`,
+    VALUES($1, $2) `,
     [postId, userId]
   );
   const {
@@ -155,13 +152,21 @@ export async function reePost(postId, userId, post) {
     `
     INSERT INTO "posts" ("description", "link", "titleurl", "descriptionurl", "imageurl","isRepost") 
     VALUES('${post.description}','${post.link}','${post.titleurl}','${post.descriptionurl}','${post.imageurl}',$1) RETURNING id;`,
-    [repostId.id]
+    [postId]
   );
+
+  const {
+    rows: [newUserId],
+  } = await connection.query(
+    `SELECT "userPosts". "userId" FROM "userPosts" WHERE "userPosts"."postId"=$1`,
+    [postId]
+  );
+
   await connection.query(
     `
     INSERT INTO "userPosts" ("postId", "userId")
     VALUES($1,$2) RETURNING id;`,
-    [newPostId.id, userId]
+    [newPostId.id, newUserId.userId]
   );
 }
 
