@@ -38,8 +38,23 @@ export async function createSession(token, userId) {
 
 export async function deleteSession(id) {
   return connection.query(
-    `
-     DELETE FROM sessions WHERE id=$1;`,
+    `DELETE FROM sessions WHERE id=$1;`,
     [id]
+  );
+}
+
+export async function velidateEmail(email){
+
+  return await connection.query(
+    `SELECT email FROM users WHERE email = $1`,
+    [email]
+  );
+}
+
+export async function createUser(picture, username, email, hashPassword){
+
+  return connection.query(
+    "INSERT INTO users (picture, username, email, password) VALUES ($1, $2, $3, $4)",
+    [picture, username, email, hashPassword]
   );
 }
