@@ -140,10 +140,12 @@ export async function deleteLike(postId, userId) {
 }
 
 export async function reePost(postId, userId, post) {
-  await connection.query(
+  const {
+    rows: [repostId],
+  } = await connection.query(
     `
     INSERT INTO "reposts" ("postId", "userId") 
-    VALUES($1, $2) `,
+    VALUES($1, $2) RETURNING id`,
     [postId, userId]
   );
   const {
@@ -152,7 +154,7 @@ export async function reePost(postId, userId, post) {
     `
     INSERT INTO "posts" ("description", "link", "titleurl", "descriptionurl", "imageurl","isRepost") 
     VALUES('${post.description}','${post.link}','${post.titleurl}','${post.descriptionurl}','${post.imageurl}',$1) RETURNING id;`,
-    [postId]
+    [repostId.id]
   );
 
   const {
@@ -185,7 +187,10 @@ export async function getRePost(postId) {
     rows: [reposts],
   } = await connection.query(
     `
-    SELECT COUNT("reposts".id) FROM reposts WHERE reposts."postId"=$1 `,
+    SELECT COUNT("reposts".id),users.username FROM reposts
+    JOIN users ON users.id=reposts."userId" AND reposts.id=$1
+    WHERE reposts."postId"=(SELECT reposts."postId" FROM reposts WHERE reposts.id=$1)
+    GROUP BY users.username `,
     [postId]
   );
   return reposts.count;
