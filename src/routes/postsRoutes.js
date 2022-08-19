@@ -9,6 +9,7 @@ import {
   unlikePost,
   updatePost,
   getComments,
+  createComment,
 } from "../controllers/postsController.js";
 import { validatePostComments } from "../middlewares/validatePostComments.js";
 import { validateCreatePost } from "../middlewares/validateCreatePost.js";
@@ -24,6 +25,7 @@ import {
   validateFollowers,
   validatePostsFollowers,
 } from "../middlewares/validateFollowers.js";
+import { validateCreateComment } from "../middlewares/validateCreateComment.js";
 
 export const postsRouter = Router();
 postsRouter.post(
@@ -68,9 +70,16 @@ postsRouter.delete(
   unlikePost
 );
 postsRouter.get("/posts/reload", authenticateToken, reloadPosts);
+
 postsRouter.get(
   "/posts/:postId/comments",
   authenticateToken,
   validatePostComments,
   getComments
+);
+postsRouter.post(
+  "/posts/:postId/comments",
+  authenticateToken,
+  validateCreateComment,
+  createComment
 );

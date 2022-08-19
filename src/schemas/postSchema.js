@@ -8,3 +8,7 @@ export const createPostSchema = Joi.object({
 export const updateSchema = Joi.object({
   description: Joi.string().required(),
 });
+
+export const createCommentSchema = Joi.object({
+  comment: Joi.string().required(),
+});
