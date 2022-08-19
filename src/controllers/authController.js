@@ -3,9 +3,10 @@ import {
   createSession,
   getSessionUserId,
   deleteSession,
-  velidateEmail,
+  validateEmail,
 } from "../repositories/authRepository.js";
 import jwt from "jsonwebtoken";
+import { createUser } from "../repositories/authRepository.js";
 
 import { getUserByEmail } from "../repositories/usersRepository.js";
 
@@ -15,7 +16,7 @@ dotenv.config();
 export default async function signUp(req, res) {
   const { username, email, password, picture } = req.body;
 
-  const { rows: isEmail } = velidateEmail(email);
+  const { rows: isEmail } = await validateEmail(email);
 
   if (isEmail.length > 0) {
     res.status(409).send("email is already being used");
