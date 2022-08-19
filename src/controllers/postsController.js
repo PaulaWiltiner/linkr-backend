@@ -91,26 +91,15 @@ export async function createPost(req, res) {
 }
 
 export async function pullPosts(req, res) {
-  //const { page } = req.query;
-
+  const { userId } = res.locals;
   try {
-    /* if ((page && page < 1) || !page) {
-      console.log('Número da página inválido!');
-      return res.sendStatus(400);
-    }
-
-    const limit = 10;
-    const start = (page - 1) * limit; */
-    
-    /* const postList = await getPosts(res.locals.userId, start); */
+    const allposts = await getPostsWithoutLimit(userId);
     const postList = await getPosts(res.locals.userId);
- 
-    /* res.status(200).send([...postList].slice(start, end)); */
-    
     return res
       .send({
         errFollower: res.locals.validateErrFollower,
         postList: postList,
+        length: allposts.length
       })
       .status(200);
   } catch (error) {
@@ -127,7 +116,6 @@ export async function updatePost(req, res) {
       id,
       description,
     ]);
-
     return res.status(200).send("successfully updated");
   } catch (error) {
     return res.sendStatus(500);

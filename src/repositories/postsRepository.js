@@ -1,6 +1,6 @@
 import { connection } from "../dbStrategy/postgres.js";
 
-export async function getPosts(userId) {
+export async function getPosts(userId, start) {
   const { rows: posts } = await connection.query(
     `
     SELECT  posts.id, json_build_object('description',posts."descriptionurl",'title',posts."titleurl",'url',posts."link", 'image',posts."imageurl") AS link,
