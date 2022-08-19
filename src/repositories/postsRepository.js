@@ -194,14 +194,3 @@ export async function getRePost(postId) {
   );
   return reposts;
 }
-
-export async function belongPost(postId, userId) {
-  const {
-    rows: [post],
-  } = await connection.query(
-    `
-    SELECT * FROM "userPosts" WHERE  "postId"=$1 AND "userId"=$2;`,
-    [postId, userId]
-  );
-  return post;
-}
