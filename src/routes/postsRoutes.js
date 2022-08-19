@@ -6,6 +6,7 @@ import {
   postsByUserId,
   pullPosts,
   reloadPosts,
+  rePost,
   unlikePost,
   updatePost,
   getComments,
@@ -25,6 +26,7 @@ import {
   validateFollowers,
   validatePostsFollowers,
 } from "../middlewares/validateFollowers.js";
+import { validateRePost } from "../middlewares/validateRePost.js";
 import { validateCreateComment } from "../middlewares/validateCreateComment.js";
 
 export const postsRouter = Router();
@@ -71,6 +73,12 @@ postsRouter.delete(
 );
 postsRouter.get("/posts/reload", authenticateToken, reloadPosts);
 
+postsRouter.post(
+  "/post/repost/:postId",
+  authenticateToken,
+  validateRePost,
+  rePost);
+  
 postsRouter.get(
   "/posts/:postId/comments",
   authenticateToken,

@@ -6,6 +6,7 @@ import {
   getPosts,
   getPostsByUserId,
   getPostsWithoutLimit,
+  reePost,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
 
@@ -175,6 +176,18 @@ export async function reloadPosts(req, res) {
 
   return res.status(200).send(posts);
 }
+
+
+export async function rePost(req, res) {
+  const { userId } = res.locals;
+  const { postId } = req.params;
+  try {
+    await reePost(postId, userId);
+    return res.sendStatus(201);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+  
 export async function getComments(req, res) {
   const { postId } = req.params;
   const { username } = res.locals.userId;
@@ -206,4 +219,5 @@ export async function createComment(req, res) {
   );
 
   return res.sendStatus(200);
+
 }
