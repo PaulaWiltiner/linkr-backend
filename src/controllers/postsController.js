@@ -1,16 +1,26 @@
 import { connection } from "../dbStrategy/postgres.js";
 import {
+  addPosts,
   createLike,
   deleteLike,
   deletePostById,
   getLikesPost,
+  getIdForEmail,
   getPosts,
   getPostsByUserId,
   getPostsWithoutLimit,
   getRePost,
+  insertHashtags,
+  insertPost,
+  insertTrending,
   reePost,
+  searchIdTrending,
+  setComment,
+  updateDescription,
+  getHashtag,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
+import { getQtdComments } from "../repositories/postsRepository.js";
 
 export async function createPost(req, res) {
   const post = req.body;
@@ -27,9 +37,8 @@ export async function createPost(req, res) {
       (hashtag) => hashtag[0] === "#"
     );
 
-    const { rows: dbHashtags } = await connection.query(
-      `SELECT hashtag FROM trending`
-    );
+    const { rows: dbHashtags } = await getHashtag();
+
     const alreadyExistHashtags = dbHashtags.map((user) => user.hashtag);
 
     const hashtagsToInsert = userHashtags.filter((userHashtag) => {
@@ -45,45 +54,35 @@ export async function createPost(req, res) {
         return userHashtag;
       }
     });
-
-    const { rows: user } = await connection.query(
-      `SELECT id FROM users WHERE email = $1;`,
-      [email]
-    );
+    post.description, post.link, titleURL, descriptionURL, imageURL;
+    const { rows: user } = await getIdForEmail(email);
     const {
       rows: [postId],
-    } = await connection.query(
-      `INSERT INTO posts (description, link, titleURL, descriptionURL , imageURL) VALUES ($1, $2, $3,$4,$5) RETURNING id`,
-      [post.description, post.link, titleURL, descriptionURL, imageURL]
+    } = await addPosts(
+      post.description,
+      post.link,
+      titleURL,
+      descriptionURL,
+      imageURL
     );
 
     hashtagsToInsert.map(async (hashtag) => {
-      await connection.query(`INSERT INTO trending (hashtag) VALUES ($1)`, [
-        hashtag,
-      ]);
+      await insertTrending(hashtag);
     });
 
     for (let i = 0; i < userHashtags.length; i++) {
       const {
         rows: [hashtagId],
-      } = await connection.query(`SELECT id FROM trending WHERE hashtag = $1`, [
-        userHashtags[i],
-      ]);
+      } = await searchIdTrending(userHashtags[i]);
 
       arrayHashtagsId.push(hashtagId.id);
     }
 
     arrayHashtagsId.map(async (id) => {
-      await connection.query(
-        `INSERT INTO "postHashtags" ("postId", "hashtagId") VALUES ($1, $2)`,
-        [postId.id, id]
-      );
+      await insertHashtags(postId.id, id);
     });
 
-    await connection.query(
-      `INSERT INTO "userPosts" ("postId", "userId") VALUES ($1, $2)`,
-      [postId.id, user[0].id]
-    );
+    await insertPost(postId.id, user[0].id);
 
     return res.sendStatus(201);
   } catch (error) {
@@ -92,15 +91,37 @@ export async function createPost(req, res) {
 }
 
 export async function pullPosts(req, res) {
+  const { userId } = res.locals;
+  const { start } = req.query;
+
   try {
-    const postList = await getPosts(res.locals.userId);
+    let startLimit = start;
+    const allposts = await getPostsWithoutLimit(userId);
+    if (!allposts.length) {
+      return res
+        .send({
+          errFollower: res.locals.validateErrFollower,
+          postList: [],
+          length: 0,
+        })
+        .status(200);
+    }
+
+    if (!start) {
+      startLimit = allposts[0].id + 1;
+    }
+
+    const postList = await getPosts(res.locals.userId, startLimit);
+
     return res
       .send({
         errFollower: res.locals.validateErrFollower,
         postList: postList,
+        length: allposts.length,
       })
       .status(200);
   } catch (error) {
+    console.log(error);
     return res.sendStatus(500);
   }
 }
@@ -110,10 +131,7 @@ export async function updatePost(req, res) {
   const { id } = req.params;
 
   try {
-    await connection.query(`UPDATE posts SET description = $2 WHERE id = $1`, [
-      id,
-      description,
-    ]);
+    updateDescription(id, description);
 
     return res.status(200).send("successfully updated");
   } catch (error) {
@@ -207,10 +225,7 @@ export async function getComments(req, res) {
 
   const {
     rows: [qtdComments],
-  } = await connection.query(
-    `SELECT COUNT("postId") as qtd FROM "postComments" WHERE "postId" = $1 GROUP BY "postId"`,
-    [postId]
-  );
+  } = await getQtdComments(postId);
 
   const comments = qtdComments ? qtdComments.qtd : 0;
 
@@ -227,10 +242,7 @@ export async function createComment(req, res) {
   const { postId } = req.params;
   const userId = res.locals.userId;
 
-  await connection.query(
-    `INSERT INTO "postComments" (comment, "userId", "postId") VALUES ($1, $2, $3)`,
-    [comment, userId, postId]
-  );
+  setComment(comment, userId, postId);
 
   return res.sendStatus(200);
 }
