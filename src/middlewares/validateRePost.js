@@ -16,6 +16,8 @@ export async function validateRePost(req, res, next) {
     const postExists = await findPost(postId);
     if (!postExists) {
       return res.sendStatus(404);
+    } else {
+      res.locals.post = postExists;
     }
     const postBelongUser = await belongPost(postId, userId);
     if (postBelongUser) {

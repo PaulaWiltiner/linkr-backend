@@ -6,6 +6,7 @@ import {
   getPosts,
   getPostsByUserId,
   getPostsWithoutLimit,
+  getRePost,
   reePost,
 } from "../repositories/postsRepository.js";
 import { getUserById } from "../repositories/usersRepository.js";
@@ -180,9 +181,21 @@ export async function rePost(req, res) {
   const { userId } = res.locals;
   const { postId } = req.params;
   try {
-    await reePost(postId, userId);
+    await reePost(postId, userId, res.locals.post);
     return res.sendStatus(201);
   } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function reePosts(req, res) {
+  const { postId } = req.params;
+  try {
+    const response = await getRePost(postId);
+    return res.status(200).send(response);
+  } catch (error) {
+    console.log(error);
     return res.sendStatus(500);
   }
 }
